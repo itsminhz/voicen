@@ -36,11 +36,14 @@ export async function transcribeAudioWav(audioBuffer: Buffer, apiKey: string): P
       headers: { Authorization: apiKey },
       body: form,
     });
-  } catch {
+  } catch (err) {
+    console.error('[voice] AssemblyAI request failed:', err);
     throw new TranscriptionError('We could not reach the transcription service. Check your connection and try again.');
   }
 
   if (!response.ok) {
+    const errorBody = await response.text().catch(() => '');
+    console.error(`[voice] AssemblyAI returned ${response.status}: ${errorBody.slice(0, 500)}`);
     if (response.status === 404) {
       throw new TranscriptionError('Speech-to-text is not configured correctly. Check the AssemblyAI API key in the dashboard config.');
     }

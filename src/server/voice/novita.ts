@@ -142,41 +142,82 @@ export async function generateNoteFromTranscript(
     throw new NoteGenerationError('AI note generation is not configured yet. Add your Novita API key in the dashboard config.');
   }
 
-  let response: Response;
-  try {
-    response = await fetch(`${NOVITA_BASE_URL}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: buildUserPrompt(transcript, mode) },
-        ],
-      }),
-    });
-  } catch {
-    throw new NoteGenerationError('We could not reach the AI service. Check your connection and try again.');
+  const body = JSON.stringify({
+    model,
+    temperature: 0.3,
+    // kimi-k3 is a reasoning model — it spends tokens on reasoning before the
+    // answer, so give it generous headroom to avoid truncated/empty content.
+    max_tokens: 8000,
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: buildUserPrompt(transcript, mode) },
+    ],
+  });
+
+  // Novita intermittently returns 429 "server_overload" — retry with backoff.
+  const MAX_ATTEMPTS = 3;
+  let response: Response | null = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      response = await fetch(`${NOVITA_BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+    } catch (err) {
+      console.error(`[voice] Novita request failed (attempt ${attempt}/${MAX_ATTEMPTS}):`, err);
+      if (attempt === MAX_ATTEMPTS) {
+        throw new NoteGenerationError('We could not reach the AI service. Check your connection and try again.');
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+      continue;
+    }
+
+    if (response.ok) break;
+
+    const errorBody = await response.text().catch(() => '');
+    console.error(
+      `[voice] Novita returned ${response.status} (attempt ${attempt}/${MAX_ATTEMPTS}): ${errorBody.slice(0, 500)}`
+    );
+
+    const retryable = response.status === 429 || response.status >= 500;
+    if (!retryable || attempt === MAX_ATTEMPTS) {
+      if (response.status === 401 || response.status === 403) {
+        throw new NoteGenerationError('The AI service rejected the API key. Check your Novita API key in the dashboard config.');
+      }
+      if (response.status === 429 || response.status >= 500) {
+        throw new NoteGenerationError('The AI service is temporarily overloaded. Please wait a moment and try again.');
+      }
+      throw new NoteGenerationError('We could not generate notes from that transcript. Please try again.');
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+    response = null;
   }
 
-  if (!response.ok) {
-    throw new NoteGenerationError('We could not generate notes from that transcript. Please try again.');
+  if (!response || !response.ok) {
+    throw new NoteGenerationError('The AI service is temporarily overloaded. Please wait a moment and try again.');
   }
 
   const payload = await response.json();
   const content = payload?.choices?.[0]?.message?.content;
   if (!content || typeof content !== 'string') {
+    console.error(
+      '[voice] Novita returned no content. finish_reason:',
+      payload?.choices?.[0]?.finish_reason,
+      'usage:',
+      JSON.stringify(payload?.usage ?? {})
+    );
     throw new NoteGenerationError('The AI did not return any notes. Please try again.');
   }
 
   try {
     const parsed = extractJson(content);
     return normalizeNote(parsed);
-  } catch {
+  } catch (err) {
+    console.error('[voice] Failed to parse Novita JSON response:', err, 'content snippet:', content.slice(0, 300));
     throw new NoteGenerationError('We had trouble understanding the AI response. Please try again.');
   }
 }

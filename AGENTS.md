@@ -357,6 +357,13 @@ introducing new ones:
 
 ### 12. VOICENOTE AI — FEATURE ARCHITECTURE
 
+**Reliability hardening (verified with live API tests using real keys):**
+- AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.
+- Novita kimi-k3 confirmed working BUT intermittently returns 429 `server_overload` → novita.ts retries up to 3x with backoff. kimi-k3 is a reasoning model (`reasoning_content` separate from `content`) → `max_tokens: 8000` set to avoid empty content on `finish_reason: length`.
+- Modelence JSON body limit is 16MB → client resamples audio to mono 16kHz (OfflineAudioContext in `src/client/lib/wav.ts`) before WAV encoding; 110s recording ≈ 4.7MB base64.
+- Mic errors: useVoiceRecorder detects embedded iframe (`window.self !== window.top`) and tells user to open app in its own tab; handles NotReadableError/SecurityError.
+- Server-side `console.error` logging added in assemblyai.ts and novita.ts (visible in dashboard Logs).
+
 This app ("VoiceNote AI") is an AI voice note / study assistant. Design identity
 is established (see `DESIGN.md`): warm "calm notebook" palette (cream/ink/amber),
 Fraunces (display) + Karla (body).

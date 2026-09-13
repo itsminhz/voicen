@@ -118,11 +118,19 @@ export function useVoiceRecorder(): UseVoiceRecorderResult {
       }, 1000);
     } catch (err: any) {
       cleanup();
-      if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
-        setError('Microphone access was denied. Please allow microphone access and try again.');
-      } else if (err?.name === 'NotFoundError') {
+      const isEmbedded = window.self !== window.top;
+      if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError' || err?.name === 'SecurityError') {
+        setError(
+          isEmbedded
+            ? 'Microphone access is blocked in this embedded preview. Open the app in its own browser tab, then allow microphone access when prompted.'
+            : 'Microphone access was denied. Click the lock icon in your browser address bar to allow microphone access, then try again.'
+        );
+      } else if (err?.name === 'NotFoundError' || err?.name === 'DevicesNotFoundError') {
         setError('No microphone was found on this device.');
+      } else if (err?.name === 'NotReadableError' || err?.name === 'TrackStartError') {
+        setError('Your microphone is in use by another app. Close other apps using the mic and try again.');
       } else {
+        console.error('[voice] Could not start recording:', err);
         setError('We could not start recording. Please try again.');
       }
       setStatus('error');

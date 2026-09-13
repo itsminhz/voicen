@@ -48,13 +48,30 @@ export function audioBufferToWav(buffer: AudioBuffer): Blob {
   return new Blob([arrayBuffer], { type: 'audio/wav' });
 }
 
+const TARGET_SAMPLE_RATE = 16000; // speech-quality; keeps uploads well under the server body limit
+
+/** Resample an AudioBuffer to mono 16kHz using OfflineAudioContext. */
+async function resampleToMono16k(buffer: AudioBuffer): Promise<AudioBuffer> {
+  if (buffer.sampleRate === TARGET_SAMPLE_RATE && buffer.numberOfChannels === 1) {
+    return buffer;
+  }
+  const length = Math.ceil((buffer.duration * TARGET_SAMPLE_RATE));
+  const offlineCtx = new OfflineAudioContext(1, length, TARGET_SAMPLE_RATE);
+  const source = offlineCtx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(offlineCtx.destination);
+  source.start(0);
+  return offlineCtx.startRendering();
+}
+
 export async function blobToWav(blob: Blob): Promise<Blob> {
   const arrayBuffer = await blob.arrayBuffer();
   const AudioContextCtor = window.AudioContext || (window as any).webkitAudioContext;
   const audioContext = new AudioContextCtor();
   try {
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    return audioBufferToWav(audioBuffer);
+    const resampled = await resampleToMono16k(audioBuffer);
+    return audioBufferToWav(resampled);
   } finally {
     audioContext.close();
   }

@@ -23,13 +23,10 @@ export interface SeoConfig {
   formatTitle: (title?: string) => string;
 }
 
-// TODO: This is a placeholder, change to the name of your project once known
-const siteName = 'Empty Project';
+const siteName = 'VoiceNote AI';
 
-// TODO: Replace with a one-sentence description of what the product does.
-// Keep it between 70 and 160 characters for good search-result rendering.
 const description =
-  'A Modelence application — replace this default description in src/client/seo.config.ts with a real product summary.';
+  'Stop typing your notes. Speak naturally and VoiceNote AI turns your voice into organized study notes, flashcards, and quizzes.';
 
 export const seoConfig: SeoConfig = {
   siteName,

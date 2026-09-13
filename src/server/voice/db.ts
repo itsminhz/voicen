@@ -1,0 +1,63 @@
+import { Store, schema } from 'modelence/server';
+
+export const NOTE_MODES = [
+  'lecture',
+  'quick_summary',
+  'exam',
+  'flashcards',
+  'study_guide',
+  'brain_dump',
+] as const;
+
+export type NoteMode = (typeof NOTE_MODES)[number];
+
+const flashcardSchema = schema.object({
+  question: schema.string(),
+  answer: schema.string(),
+});
+
+const definitionSchema = schema.object({
+  term: schema.string(),
+  definition: schema.string(),
+});
+
+const formulaSchema = schema.object({
+  formula: schema.string(),
+  description: schema.string().optional(),
+});
+
+const sectionSchema = schema.object({
+  heading: schema.string(),
+  content: schema.string(),
+});
+
+export const dbNotes = new Store('voiceNotes', {
+  schema: {
+    userId: schema.userId(),
+    mode: schema.enum(NOTE_MODES),
+    title: schema.string(),
+    subject: schema.string().optional(),
+    tags: schema.array(schema.string()).optional(),
+
+    transcript: schema.string(),
+
+    summary: schema.string().optional(),
+    keyConcepts: schema.array(schema.string()).optional(),
+    detailedNotes: schema.array(sectionSchema).optional(),
+    definitions: schema.array(definitionSchema).optional(),
+    formulas: schema.array(formulaSchema).optional(),
+    examples: schema.array(schema.string()).optional(),
+    importantPoints: schema.array(schema.string()).optional(),
+    examFocus: schema.array(schema.string()).optional(),
+    questionsToReview: schema.array(schema.string()).optional(),
+    flashcards: schema.array(flashcardSchema).optional(),
+    additionalContext: schema.string().optional(),
+
+    createdAt: schema.date(),
+    updatedAt: schema.date(),
+  },
+  indexes: [
+    { key: { userId: 1, createdAt: -1 } },
+    { key: { userId: 1, updatedAt: -1 } },
+  ],
+});

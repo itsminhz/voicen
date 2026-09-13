@@ -23,43 +23,43 @@ export const CONTROL_BASE =
 export const VARIANT_COLOR: Record<Variant, Record<Color, string>> = {
   solid: {
     neutral:
-      "bg-black text-white shadow hover:bg-gray-800 active:bg-gray-900 focus-visible:ring-gray-500",
+      "bg-ink text-paper shadow hover:bg-ink/85 active:bg-ink/75 focus-visible:ring-ink/40",
     primary:
-      "bg-blue-600 text-white shadow hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-blue-500",
+      "bg-accent text-accent-contrast shadow hover:bg-accent-dark active:bg-accent-dark focus-visible:ring-accent/50",
     destructive:
-      "bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500",
+      "bg-danger text-accent-contrast shadow-sm hover:bg-danger/85 active:bg-danger/75 focus-visible:ring-danger/40",
   },
   outline: {
     neutral:
-      "border border-gray-300 bg-white text-gray-900 shadow-sm hover:bg-gray-50 active:bg-gray-100 focus-visible:ring-gray-500",
+      "border border-line bg-surface text-ink shadow-sm hover:bg-paper-dim active:bg-paper-dim focus-visible:ring-ink/30",
     primary:
-      "border border-blue-300 bg-white text-blue-700 shadow-sm hover:bg-blue-50 active:bg-blue-100 focus-visible:ring-blue-500",
+      "border border-accent/40 bg-surface text-accent-dark shadow-sm hover:bg-accent-soft/60 active:bg-accent-soft focus-visible:ring-accent/40",
     destructive:
-      "border border-red-300 bg-white text-red-700 shadow-sm hover:bg-red-50 active:bg-red-100 focus-visible:ring-red-500",
+      "border border-danger/30 bg-surface text-danger shadow-sm hover:bg-danger-soft active:bg-danger-soft focus-visible:ring-danger/40",
   },
   ghost: {
     neutral:
-      "text-gray-900 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-500",
+      "text-ink hover:bg-paper-dim active:bg-line-soft focus-visible:ring-ink/30",
     primary:
-      "text-blue-700 hover:bg-blue-50 active:bg-blue-100 focus-visible:ring-blue-500",
+      "text-accent-dark hover:bg-accent-soft/50 active:bg-accent-soft focus-visible:ring-accent/40",
     destructive:
-      "text-red-700 hover:bg-red-50 active:bg-red-100 focus-visible:ring-red-500",
+      "text-danger hover:bg-danger-soft active:bg-danger-soft focus-visible:ring-danger/40",
   },
   link: {
     neutral:
-      "text-gray-900 underline-offset-4 hover:underline focus-visible:ring-gray-500",
+      "text-ink underline-offset-4 hover:underline focus-visible:ring-ink/30",
     primary:
-      "text-blue-600 underline-offset-4 hover:underline focus-visible:ring-blue-500",
+      "text-accent-dark underline-offset-4 hover:underline focus-visible:ring-accent/40",
     destructive:
-      "text-red-600 underline-offset-4 hover:underline focus-visible:ring-red-500",
+      "text-danger underline-offset-4 hover:underline focus-visible:ring-danger/40",
   },
   soft: {
     neutral:
-      "bg-gray-100 text-gray-900 shadow-sm hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-500",
+      "bg-paper-dim text-ink shadow-sm hover:bg-line-soft active:bg-line focus-visible:ring-ink/30",
     primary:
-      "bg-blue-100 text-blue-800 shadow-sm hover:bg-blue-200 active:bg-blue-300 focus-visible:ring-blue-500",
+      "bg-accent-soft text-accent-dark shadow-sm hover:bg-accent-soft/70 active:bg-accent-soft focus-visible:ring-accent/40",
     destructive:
-      "bg-red-100 text-red-800 shadow-sm hover:bg-red-200 active:bg-red-300 focus-visible:ring-red-500",
+      "bg-danger-soft text-danger shadow-sm hover:bg-danger-soft/70 active:bg-danger-soft focus-visible:ring-danger/40",
   },
 };
 

@@ -8,19 +8,19 @@ export type BadgeVariant = "solid" | "soft" | "outline";
 /** Static (non-interactive) variant×color classes for badges. */
 const BADGE_CLASSES: Record<BadgeVariant, Record<Color, string>> = {
   solid: {
-    neutral: "bg-black text-white",
-    primary: "bg-blue-600 text-white",
-    destructive: "bg-red-600 text-white",
+    neutral: "bg-ink text-paper",
+    primary: "bg-accent text-accent-contrast",
+    destructive: "bg-danger text-accent-contrast",
   },
   soft: {
-    neutral: "bg-gray-100 text-gray-800",
-    primary: "bg-blue-100 text-blue-800",
-    destructive: "bg-red-100 text-red-800",
+    neutral: "bg-paper-dim text-ink-soft",
+    primary: "bg-accent-soft text-accent-dark",
+    destructive: "bg-danger-soft text-danger",
   },
   outline: {
-    neutral: "border border-gray-300 text-gray-900",
-    primary: "border border-blue-300 text-blue-700",
-    destructive: "border border-red-300 text-red-700",
+    neutral: "border border-line text-ink",
+    primary: "border border-accent/40 text-accent-dark",
+    destructive: "border border-danger/30 text-danger",
   },
 };
 

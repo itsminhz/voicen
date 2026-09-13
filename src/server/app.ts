@@ -1,9 +1,10 @@
 import { startApp } from 'modelence/server';
 import exampleModule from '@/server/example';
+import voiceModule from '@/server/voice';
 import { createDemoUser } from '@/server/migrations/createDemoUser';
 
 startApp({
-  modules: [exampleModule /* Add your modules here */],
+  modules: [exampleModule, voiceModule],
 
   email: {
     // Without this the reset link redirects to the site root and dead-ends.

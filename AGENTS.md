@@ -355,6 +355,75 @@ introducing new ones:
     `queries`, `mutations`, optional `cronJobs`), and register it in
     `src/server/app.ts`.
 
+### 12. VOICENOTE AI — FEATURE ARCHITECTURE
+
+This app ("VoiceNote AI") is an AI voice note / study assistant. Design identity
+is established (see `DESIGN.md`): warm "calm notebook" palette (cream/ink/amber),
+Fraunces (display) + Karla (body).
+
+**Backend (`src/server/voice/`)**
+- `db.ts` — `dbNotes` Store (`voiceNotes` collection). `NOTE_MODES` = `lecture |
+  quick_summary | exam | flashcards | study_guide | brain_dump` (all 6 built).
+  Schema holds full structured note (title, subject, tags, transcript, summary,
+  keyConcepts, detailedNotes, definitions, formulas, examples, importantPoints,
+  examFocus, questionsToReview, flashcards, additionalContext).
+- `assemblyai.ts` — `transcribeAudioWav(buffer, apiKey)` calls the **AssemblyAI
+  Dictation API** (`https://dictation.assemblyai.com/v1/transcribe/live`, NOT the
+  standard Sync/Streaming API). Multipart body: `config` part (JSON) first, then
+  `audio` part. **Only accepts WAV/raw 16-bit PCM** (rejects webm with 415), max
+  120s. Auth header is raw `Authorization: <key>` (no `Bearer`). Never replace
+  this with browser SpeechRecognition — it must stay the primary STT engine.
+- `novita.ts` — `generateNoteFromTranscript(transcript, mode, apiKey, model)`
+  calls Novita's OpenAI-compatible endpoint (`https://api.novita.ai/openai/chat/completions`).
+  Enforces via system prompt: transcript is source of truth, never invent facts,
+  preserve uncertainty, put any added explanation under `additionalContext`.
+  `normalizeNote()` sanitizes arbitrary LLM JSON into the strict shape.
+- `index.ts` — `voiceModule`. Config: `assemblyaiApiKey` (secret), `novitaApiKey`
+  (secret), `novitaModel` (string, default `meta-llama/llama-3.1-8b-instruct`,
+  user-configurable, never hardcode). Queries: `getNotes`, `getNote`. Mutations:
+  `transcribeAudio` (base64 audio → transcript), `generateNote`, `saveNote`,
+  `updateNote`, `deleteNote`, `duplicateNote`. Registered in `src/server/app.ts`.
+  **Both API keys currently default to empty string placeholders** — user must
+  fill them in via the Config dashboard before recording/generation will work.
+
+**Audio pipeline (client)**: `MediaRecorder` records webm → `src/client/lib/wav.ts`
+(`blobToWav`) decodes via Web Audio API and re-encodes as 16-bit PCM WAV (required
+by AssemblyAI) → `blobToBase64` → sent as a mutation arg (not a raw multipart
+route) → server decodes base64 → Buffer → AssemblyAI.
+
+**Client feature folder (`src/client/features/voice/`)**
+- `useVoiceRecorder.ts` — recording hook (status/seconds/levels/error, start/stop/
+  reset). `MAX_RECORDING_SECONDS = 110` (under AssemblyAI's 120s cap).
+- `modes.ts` — `NOTE_MODES` + `MODE_META` (label/description/icon per mode).
+- `types.ts` — `GeneratedNote`, `NoteSummary`, `FullNote` client-side types.
+- `MicButton.tsx`, `Waveform.tsx` — recording UI (pulse/ring animations, live
+  level bars).
+- `ModeSelector.tsx` — grid of 6 mode cards, selectable before/after recording.
+- `ProcessingStage.tsx` — staged loading UI (Transcribing → Organizing → Saving).
+- `NoteView.tsx` — renders a `GeneratedNote`; single component handles both
+  read-only preview (post-generation) and editable mode (`onChange` prop) so
+  it's reused across `NewNotePage` (preview before save) and `NotePage` (full
+  editor with autosave).
+- `FlashcardDeck.tsx` — flip-card viewer for the flashcards array (read-only mode).
+
+**Pages**
+- `NewNotePage.tsx` (`/new`) — record→transcript review→mode select→generate→
+  preview→save flow. Also has a "Write" tab to type/paste text instead of
+  recording (skips transcription, same generate/save flow).
+- `NotesPage.tsx` (`/notes`) — saved notes list: search, sort (updated/created/
+  title), open/delete/duplicate, empty state.
+- `NotePage.tsx` (`/notes/:noteId`) — note detail/editor with debounced autosave
+  (800ms) and a Saving/Saved indicator.
+- `HomePage.tsx` — minimal landing (logo/one-liner/Login/Signup) for guests;
+  dashboard (greeting, big mic card, quick actions, recent notes) for logged-in
+  users. Quick actions: New Voice Note, Write Note, Quiz Me (disabled placeholder
+  — not yet built), Browse Notes.
+
+**Deferred (not yet built, by design — one vertical slice at a time)**: Quiz Me,
+Ask My Note, and the Explain/Simplify/Expand/Make Flashcards study actions on
+saved notes. `Quiz Me` currently renders as a disabled quick-action card on the
+dashboard. Build these as a separate follow-up slice.
+
 ### Summary
 
 This is a full-stack Modelence framework application with:

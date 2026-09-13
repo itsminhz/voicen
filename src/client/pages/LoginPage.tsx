@@ -52,7 +52,7 @@ function LoginForm() {
           <button
             type="button"
             onClick={() => setUnverifiedEmail(null)}
-            className="text-sm text-gray-600 underline hover:no-underline"
+            className="text-sm text-ink-soft underline hover:no-underline"
           >
             Back to sign in
           </button>
@@ -62,10 +62,10 @@ function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm mx-auto bg-white">
+    <Card className="w-full max-w-sm mx-auto animate-slide-up">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">
-          Sign in to your account
+        <CardTitle className="font-display text-xl">
+          Welcome back
         </CardTitle>
       </CardHeader>
       
@@ -91,7 +91,7 @@ function LoginForm() {
               </Label>
               <Link
                 to="/forgot-password"
-                className="text-sm text-gray-600 underline hover:no-underline"
+                className="text-sm text-ink-soft underline hover:no-underline"
               >
                 Forgot your password?
               </Link>
@@ -115,11 +115,11 @@ function LoginForm() {
       </CardContent>
 
       <CardFooter className="justify-center">
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-ink-soft">
           Don't have an account?{' '}
           <Link
             to="/signup"
-            className="text-gray-900 underline hover:no-underline font-medium"
+            className="text-ink underline hover:no-underline font-medium"
           >
             Sign up
           </Link>

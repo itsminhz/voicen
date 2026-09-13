@@ -49,11 +49,11 @@ function SignupForm() {
         email={signupEmail}
         title="Check your inbox"
         footer={
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-ink-soft">
             Already verified?{' '}
             <Link
               to="/login"
-              className="text-gray-900 underline hover:no-underline font-medium"
+              className="text-ink underline hover:no-underline font-medium"
             >
               Sign in
             </Link>
@@ -64,10 +64,10 @@ function SignupForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm mx-auto bg-white text-gray-900">
+    <Card className="w-full max-w-sm mx-auto animate-slide-up">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">
-          Create an account
+        <CardTitle className="font-display text-xl">
+          Create your account
         </CardTitle>
       </CardHeader>
       
@@ -115,13 +115,13 @@ function SignupForm() {
                 id="consent-terms"
                 type="checkbox"
                 name="consent-terms"
-                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300"
+                className="w-4 h-4 border border-line rounded bg-surface text-accent focus:ring-2 focus:ring-accent/40"
                 required
               />
             </div>
             <div className="ml-3 text-sm">
-              <Label htmlFor="consent-terms" className="text-gray-600">
-                I accept the <a className="font-medium text-blue-600 hover:underline" href="/terms" target="_blank">Terms and Conditions</a>
+              <Label htmlFor="consent-terms" className="text-ink-soft">
+                I accept the <a className="font-medium text-accent-dark hover:underline" href="/terms" target="_blank">Terms and Conditions</a>
               </Label>
             </div>
           </div>
@@ -136,11 +136,11 @@ function SignupForm() {
       </CardContent>
 
       <CardFooter className="justify-center">
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-ink-soft">
           Already have an account?{' '}
           <Link
             to="/login"
-            className="text-gray-900 underline hover:no-underline font-medium"
+            className="text-ink underline hover:no-underline font-medium"
           >
             Sign in here
           </Link>

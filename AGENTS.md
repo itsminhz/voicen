@@ -379,7 +379,7 @@ Fraunces (display) + Karla (body).
   preserve uncertainty, put any added explanation under `additionalContext`.
   `normalizeNote()` sanitizes arbitrary LLM JSON into the strict shape.
 - `index.ts` — `voiceModule`. Config: `assemblyaiApiKey` (secret), `novitaApiKey`
-  (secret), `novitaModel` (string, default `meta-llama/llama-3.1-8b-instruct`,
+  (secret), `novitaModel` (string, default `moonshotai/kimi-k3`,
   user-configurable, never hardcode). Queries: `getNotes`, `getNote`. Mutations:
   `transcribeAudio` (base64 audio → transcript), `generateNote`, `saveNote`,
   `updateNote`, `deleteNote`, `duplicateNote`. Registered in `src/server/app.ts`.

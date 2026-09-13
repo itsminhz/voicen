@@ -19,8 +19,14 @@ export async function transcribeAudioWav(audioBuffer: Buffer, apiKey: string): P
     throw new TranscriptionError('Speech-to-text is not configured yet. Add your AssemblyAI API key in the dashboard config.');
   }
 
+  const config = {
+    // Describes the situation to the ASR model (per AssemblyAI Dictation docs) —
+    // helps it transcribe academic/study vocabulary more accurately.
+    stt_prompt: 'A student dictating study notes about an academic topic, possibly including technical terms, definitions, and formulas.',
+  };
+
   const form = new FormData();
-  form.append('config', new Blob([JSON.stringify({})], { type: 'application/json' }));
+  form.append('config', new Blob([JSON.stringify(config)], { type: 'application/json' }));
   form.append('audio', new Blob([new Uint8Array(audioBuffer)], { type: 'audio/wav' }), 'audio.wav');
 
   let response: Response;

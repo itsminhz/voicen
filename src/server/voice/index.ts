@@ -27,7 +27,7 @@ const voiceModule = new Module('voice', {
     },
     novitaModel: {
       type: 'string',
-      default: 'meta-llama/llama-3.1-8b-instruct',
+      default: 'moonshotai/kimi-k3',
       isPublic: false,
     },
   },

@@ -3,32 +3,24 @@ import { Link } from 'react-router';
 import { ChevronDown, ChevronRight, LogIn, Menu } from 'lucide-react';
 
 function VoicenLogo() {
-  // Sky gradient rounded tile with white voice waveform bars
+  // Sky-blue voice waveform bars, no background
   return (
     <svg viewBox="0 0 32 32" className="w-7 h-7 sm:w-8 sm:h-8" aria-label="Voicen AI logo">
-      <defs>
-        <linearGradient id="voicen-logo-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="100%" stopColor="#0284c7" />
-        </linearGradient>
-      </defs>
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#voicen-logo-grad)" />
-      {/* waveform bars */}
       {[
-        { x: 7.5, h: 8 },
-        { x: 12, h: 14 },
-        { x: 16.5, h: 20 },
-        { x: 21, h: 12 },
-        { x: 25.5, h: 6 },
+        { x: 5, h: 10 },
+        { x: 10.5, h: 18 },
+        { x: 16, h: 26 },
+        { x: 21.5, h: 15 },
+        { x: 27, h: 8 },
       ].map((bar, i) => (
         <rect
           key={i}
-          x={bar.x - 1.25}
+          x={bar.x - 1.6}
           y={16 - bar.h / 2}
-          width={2.5}
+          width={3.2}
           height={bar.h}
-          rx={1.25}
-          fill="white"
+          rx={1.6}
+          fill="#0ea5e9"
         />
       ))}
     </svg>

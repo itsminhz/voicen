@@ -141,7 +141,12 @@ const voiceModule = new Module('voice', {
       requireUser(user);
       const { audioBase64 } = z.object({ audioBase64: z.string().min(1) }).parse(args);
 
-      const apiKey = voiceModule.getConfig('assemblyaiApiKey');
+      const apiKey = String(voiceModule.getConfig('assemblyaiApiKey') ?? '').trim();
+      // Diagnostic (never logs the key itself): confirms whether the config
+      // value reaches this environment.
+      console.log(
+        `[voice] transcribeAudio: assemblyaiApiKey is ${apiKey ? `set (${apiKey.length} chars)` : 'EMPTY in this environment'}`
+      );
       const audioBuffer = Buffer.from(audioBase64, 'base64');
 
       if (audioBuffer.byteLength < 1000) {

@@ -480,6 +480,11 @@ displayName to "Alex" for the demo handle (until profile sets its own name).
 - Mic errors: useVoiceRecorder detects embedded iframe (`window.self !== window.top`) and tells user to open app in its own tab; handles NotReadableError/SecurityError.
 - Server-side `console.error` logging added in assemblyai.ts and novita.ts (visible in dashboard Logs).
 
+**Favicon:** `src/client/public/favicon.svg` (Vite root is src/client so public/
+is served at /) — white rounded square + sky waveform bars matching VoicenLogo.
+Linked in `src/client/index.html` (`rel=icon` + apple-touch-icon) along with a
+static `<title>Voicen AI</title>` fallback.
+
 **Latest UX tweaks (Sep 14):** header no longer shows the user's email next to
 the avatar (Page.tsx renders just `<UserMenu />`); SignupPage slimmed down (no
 confirm-password field, no terms checkbox — replaced by a one-line "By signing

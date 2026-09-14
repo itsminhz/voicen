@@ -23,13 +23,13 @@ function Header() {
   const { user } = useSession();
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-line bg-paper/80 backdrop-blur-sm sticky top-0 z-10">
-      <Link to="/" className="flex items-center gap-2 group">
-        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-accent text-accent-contrast shadow-sm group-hover:bg-accent-dark transition-colors">
-          <Mic className="w-4.5 h-4.5" strokeWidth={2.25} />
+    <header className="flex items-center justify-between px-4 sm:px-8 h-14 border-b border-line bg-surface/80 backdrop-blur-md sticky top-0 z-10">
+      <Link to="/" className="flex items-center gap-2.5 group">
+        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-ink text-surface shadow-sm group-hover:bg-ink/85 transition-colors">
+          <Mic className="w-4 h-4" strokeWidth={2.25} />
         </span>
-        <span className="font-display text-lg font-semibold tracking-tight text-ink">
-          VoiceNote <span className="text-accent">AI</span>
+        <span className="text-[15px] font-semibold tracking-tight text-ink">
+          VoiceNote <span className="text-ink-faint">AI</span>
         </span>
       </Link>
 

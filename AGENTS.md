@@ -357,6 +357,18 @@ introducing new ones:
 
 ### 12. VOICENOTE AI — FEATURE ARCHITECTURE
 
+**UI redesign (user-requested):** Theme switched from warm notebook to clean
+shadcn-style light (white/zinc, Geist font, black primary buttons). Same token
+names in index.css (`paper`, `ink`, `accent`, `line`, ...) — only values were
+remapped, so components didn't need class changes. Recording state uses `danger`
+(red). Card = rounded-xl border-line.
+
+**Top-level workspace modes (product direction):** 3 modes — Student (built:
+the existing 6-note-mode study flow at /new), Meetings (transcribe conversation
+→ summary + action items + key decisions; NOT BUILT YET, placeholder card on
+dashboard), Sticky Notes (voice → Keep-style checkable lists; NOT BUILT YET,
+placeholder; user hasn't answered detail question about list format yet).
+
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.
 - Novita kimi-k3 confirmed working BUT intermittently returns 429 `server_overload` → novita.ts retries up to 3x with backoff. kimi-k3 is a reasoning model (`reasoning_content` separate from `content`) → `max_tokens: 8000` set to avoid empty content on `finish_reason: length`.

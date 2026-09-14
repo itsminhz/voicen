@@ -22,9 +22,9 @@ export default function MicButton({ recording, requesting, onClick, size = 'lg' 
     >
       {recording && (
         <>
-          <span className="absolute inline-flex rounded-full bg-accent/30 animate-mic-ring" style={{ width: '100%', height: '100%' }} />
+          <span className="absolute inline-flex rounded-full bg-danger/30 animate-mic-ring" style={{ width: '100%', height: '100%' }} />
           <span
-            className="absolute inline-flex rounded-full bg-accent/20 animate-mic-ring"
+            className="absolute inline-flex rounded-full bg-danger/20 animate-mic-ring"
             style={{ width: '100%', height: '100%', animationDelay: '0.6s' }}
           />
         </>
@@ -34,7 +34,7 @@ export default function MicButton({ recording, requesting, onClick, size = 'lg' 
           dim,
           'relative flex items-center justify-center rounded-full shadow-md transition-all duration-300',
           recording
-            ? 'bg-accent text-accent-contrast animate-mic-pulse'
+            ? 'bg-danger text-accent-contrast animate-mic-pulse'
             : 'bg-accent text-accent-contrast hover:bg-accent-dark hover:scale-105'
         )}
       >

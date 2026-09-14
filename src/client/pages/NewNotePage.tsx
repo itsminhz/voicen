@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useMutation } from '@tanstack/react-query';
 import { modelenceMutation } from '@modelence/react-query';
 import { toast } from 'react-hot-toast';
-import { Mic, PenLine, RefreshCcw, ArrowRight, Save, AlertCircle } from 'lucide-react';
+import { Mic, PenLine, RefreshCcw, ArrowRight, Save, AlertCircle, GraduationCap } from 'lucide-react';
 import Page from '@/client/components/Page';
 import { Card, CardContent } from '@/client/components/ui/Card';
 import { Button } from '@/client/components/ui/Button';
@@ -109,7 +109,12 @@ export default function NewNotePage() {
     <Page seo={{ title: 'New Voice Note' }} className="max-w-3xl mx-auto w-full">
       <div className="space-y-6 animate-fade-in">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">New Voice Note</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-ink">New Voice Note</h1>
+            <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-ink-soft">
+              <GraduationCap className="h-3 w-3" /> Student
+            </span>
+          </div>
           <p className="mt-1 text-sm text-ink-soft">Speak your thoughts and let AI organize them into study notes.</p>
         </div>
 

@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import Navbar from './Navbar';
 import DashboardPreview from './DashboardPreview';
 import LandingSections from './LandingSections';
+import assemblyaiLogo from '@/client/assets/assemblyai.png';
 
 const VIDEO_URL =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260424_064411_9e9d7f84-9277-41f4-ab10-59172d89e6be.mp4';
@@ -38,11 +39,12 @@ export default function LandingHero() {
 
           <div className="flex flex-col items-center px-4 pt-10 sm:pt-16 pb-8 sm:pb-12 text-center">
             <span
-              className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 shadow-sm"
+              className="animated-border-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5 shadow-sm text-neutral-800 font-medium"
               style={{ fontSize: 13 }}
             >
-              <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: '#0ea5e9' }} />
-              Voicen AI
+              Built for
+              <img src={assemblyaiLogo} alt="AssemblyAI" className="h-4 w-auto" />
+              AssemblyAI Hackathon
             </span>
 
             <h1

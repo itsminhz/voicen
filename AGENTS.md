@@ -375,6 +375,14 @@ to landing look: date pill w/ sky dot, serif-italic first name, sky pill
 "Start recording" CTA w/ arrow circle, `IconChip` helper (white circle,
 hairline border, sky stroke icon @1.5) used for stats/modes/note rows/rail,
 mode tiles show sky tag lines, filter tab active = bg-accent.
+Hero badge = "Built for [AssemblyAI logo] AssemblyAI Hackathon" with animated
+gradient border (`.animated-border-pill` in index.css: @property --border-angle
++ conic-gradient border-box spin, 3.5s). Logo asset:
+`src/client/assets/assemblyai.png` (from chat attachment). DashboardPreview
+copy made Voicen-relevant (same design): Notes created 128 +32 green / goal
+gauge 92% 128→140 / toggle Study notes|Meetings; form = Show figures for,
+Default note mode, Note goal 140, Recording goal 12; Voice minutes 47 +12 /
+Action items completed gauge 68% 17→25 / toggle Recordings|Sticky lists.
 
 **Top-level workspace modes (product direction):** 3 modes —
 - Student (BUILT): 6-note-mode study flow at /new.

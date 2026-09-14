@@ -79,6 +79,34 @@
   100% { background-position: 200% 0; }
 }
 
+/* Animated gradient border (landing hero badge) */
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-spin {
+  to { --border-angle: 360deg; }
+}
+
+.animated-border-pill {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      #0ea5e9,
+      #7dd3fc,
+      #e0f2fe,
+      #ffffff,
+      #38bdf8,
+      #0284c7,
+      #0ea5e9
+    ) border-box;
+  animation: border-spin 3.5s linear infinite;
+}
+
 /* Base UI: establish a stacking context at the root so portalled
    popups (Dialog, Select, Menu, Tooltip) layer above page content. */
 html {

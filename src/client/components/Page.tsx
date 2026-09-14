@@ -3,8 +3,9 @@
  */
 
 import React from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useSession } from 'modelence/client';
+import { AudioLines, FileText } from 'lucide-react';
 import LoadingSpinner from '@/client/components/LoadingSpinner';
 import VoicenLogo from '@/client/components/VoicenLogo';
 import { Seo, type SeoProps } from '@/client/components/Seo';
@@ -20,6 +21,23 @@ interface PageProps {
   seo?: SeoProps;
 }
 
+function HeaderNavLink({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
+  const { pathname } = useLocation();
+  const isActive = pathname === to || pathname.startsWith(`${to}/`);
+  return (
+    <Link
+      to={to}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+        isActive ? 'bg-accent-soft text-accent-dark' : 'text-ink-soft hover:bg-paper-dim hover:text-ink'
+      )}
+    >
+      {icon}
+      <span className="hidden sm:inline">{label}</span>
+    </Link>
+  );
+}
+
 function Header() {
   const { user } = useSession();
 
@@ -33,8 +51,12 @@ function Header() {
       </Link>
 
       {user ? (
-        <div className="flex items-center gap-3">
-          <UserMenu />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <HeaderNavLink to="/voices" icon={<AudioLines className="h-4 w-4" />} label="Voices" />
+          <HeaderNavLink to="/notes" icon={<FileText className="h-4 w-4" />} label="Notes" />
+          <div className="ml-1 sm:ml-2">
+            <UserMenu />
+          </div>
         </div>
       ) : (
         <div className="flex items-center gap-2">

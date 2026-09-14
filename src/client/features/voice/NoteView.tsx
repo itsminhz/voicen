@@ -115,13 +115,13 @@ export default function NoteView({ note, onChange, readOnly = false }: NoteViewP
         </Section>
       )}
 
-      {(note.keyConcepts?.length > 0 || !readOnly) && (
+      {note.keyConcepts?.length > 0 && (
         <Section title="Key Concepts">
           <ListEditor items={note.keyConcepts} onChange={(v) => update('keyConcepts', v)} readOnly={readOnly} placeholder="Add concept" />
         </Section>
       )}
 
-      {(note.detailedNotes?.length > 0 || !readOnly) && (
+      {note.detailedNotes?.length > 0 && (
         <Section title="Detailed Notes">
           <div className="space-y-4">
             {note.detailedNotes.map((section, i) => (
@@ -181,7 +181,7 @@ export default function NoteView({ note, onChange, readOnly = false }: NoteViewP
         </Section>
       )}
 
-      {(note.definitions?.length > 0 || !readOnly) && (
+      {note.definitions?.length > 0 && (
         <Section title="Important Definitions">
           <div className="space-y-2">
             {note.definitions.map((def, i) => (
@@ -240,7 +240,7 @@ export default function NoteView({ note, onChange, readOnly = false }: NoteViewP
         </Section>
       )}
 
-      {(note.formulas?.length > 0 || !readOnly) && (
+      {note.formulas?.length > 0 && (
         <Section title="Formulas">
           <div className="space-y-2">
             {note.formulas.map((f, i) => (
@@ -299,13 +299,13 @@ export default function NoteView({ note, onChange, readOnly = false }: NoteViewP
         </Section>
       )}
 
-      {(note.examples?.length > 0 || !readOnly) && (
+      {note.examples?.length > 0 && (
         <Section title="Examples">
           <ListEditor items={note.examples} onChange={(v) => update('examples', v)} readOnly={readOnly} placeholder="Add example" />
         </Section>
       )}
 
-      {(note.importantPoints?.length > 0 || !readOnly) && (
+      {note.importantPoints?.length > 0 && (
         <Section title="Important Points">
           <ListEditor
             items={note.importantPoints}
@@ -316,13 +316,13 @@ export default function NoteView({ note, onChange, readOnly = false }: NoteViewP
         </Section>
       )}
 
-      {(note.examFocus?.length > 0 || !readOnly) && (
+      {note.examFocus?.length > 0 && (
         <Section title="Exam Focus">
           <ListEditor items={note.examFocus} onChange={(v) => update('examFocus', v)} readOnly={readOnly} placeholder="Add focus area" />
         </Section>
       )}
 
-      {(note.questionsToReview?.length > 0 || !readOnly) && (
+      {note.questionsToReview?.length > 0 && (
         <Section title="Questions to Review">
           <ListEditor
             items={note.questionsToReview}
@@ -385,6 +385,56 @@ export default function NoteView({ note, onChange, readOnly = false }: NoteViewP
             </Button>
           )}
         </Section>
+      )}
+
+      {!readOnly && (
+        <div className="flex flex-wrap gap-2 border-t border-line-soft pt-4">
+          {note.keyConcepts?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('keyConcepts', [''])}>
+              Key Concepts
+            </Button>
+          )}
+          {note.detailedNotes?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('detailedNotes', [{ heading: '', content: '' }])}>
+              Detailed Notes
+            </Button>
+          )}
+          {note.definitions?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('definitions', [{ term: '', definition: '' }])}>
+              Definitions
+            </Button>
+          )}
+          {note.formulas?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('formulas', [{ formula: '', description: '' }])}>
+              Formulas
+            </Button>
+          )}
+          {note.examples?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('examples', [''])}>
+              Examples
+            </Button>
+          )}
+          {note.importantPoints?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('importantPoints', [''])}>
+              Important Points
+            </Button>
+          )}
+          {note.examFocus?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('examFocus', [''])}>
+              Exam Focus
+            </Button>
+          )}
+          {note.questionsToReview?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('questionsToReview', [''])}>
+              Questions to Review
+            </Button>
+          )}
+          {note.flashcards?.length === 0 && (
+            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => update('flashcards', [{ question: '', answer: '' }])}>
+              Flashcards
+            </Button>
+          )}
+        </div>
       )}
 
       {(note.additionalContext || !readOnly) && (

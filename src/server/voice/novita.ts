@@ -21,19 +21,21 @@ export interface GeneratedNote {
   additionalContext?: string;
 }
 
+// Each mode must produce a clearly different note. Fields not listed as
+// "fill" MUST be left empty ([] / null) so the output shape matches the mode.
 const MODE_INSTRUCTIONS: Record<StudyMode, string> = {
   lecture:
-    'Produce detailed, well-organized lecture notes. Break the material into logical sections in "detailedNotes". Be thorough but do not pad content that was not discussed.',
+    'Produce detailed, well-organized lecture notes. FILL: "detailedNotes" (thorough logical sections — this is the core output), "summary", "keyConcepts", plus "definitions"/"formulas"/"examples" when present in the transcript. LEAVE EMPTY: "flashcards", "examFocus". Do not pad content that was not discussed.',
   quick_summary:
-    'Produce only a short, high-signal summary. Keep "summary" concise (3-5 sentences), keep other arrays short (1-3 items) or empty when not clearly present in the transcript.',
+    'Produce ONLY a short, high-signal summary. FILL: "summary" (3-5 concise sentences) and "importantPoints" (3-6 bullets max). LEAVE EMPTY ([]): "keyConcepts", "detailedNotes", "definitions", "formulas", "examples", "examFocus", "questionsToReview", "flashcards".',
   exam:
-    'Focus on exam preparation: prioritize "definitions", "formulas", "importantPoints" and "examFocus". Keep "detailedNotes" brief.',
+    'Focus strictly on exam preparation. FILL: "definitions", "formulas", "importantPoints", "examFocus" and "questionsToReview" as fully as the content supports. Keep "summary" to 2-3 sentences. LEAVE EMPTY ([]): "detailedNotes", "examples", "flashcards".',
   flashcards:
-    'Focus primarily on producing many high-quality "flashcards" (aim for as many as the content supports). Keep other sections brief.',
+    'Your PRIMARY and almost only output is "flashcards": produce as many high-quality question/answer cards as the content supports (typically 8-25; cover every fact, definition and concept in the transcript). Keep "summary" to 1-2 sentences and "keyConcepts" to at most 5. LEAVE EMPTY ([]): "detailedNotes", "definitions", "formulas", "examples", "importantPoints", "examFocus", "questionsToReview".',
   study_guide:
-    'Produce a structured revision guide: clear "detailedNotes" sections ordered logically, plus concise "keyConcepts" and "importantPoints" for quick review.',
+    'Produce a structured revision guide. FILL: "detailedNotes" (clear sections ordered logically for revision), "keyConcepts", "importantPoints" and "questionsToReview". LEAVE EMPTY ([]): "flashcards", "examFocus".',
   brain_dump:
-    'The transcript is unstructured, rambling speech. Your main job is to find the underlying structure and organize it clearly into logical "detailedNotes" sections and "keyConcepts", without inventing structure that isn\'t implied by the content.',
+    'The transcript is unstructured, rambling speech. Find the underlying structure and organize it into logical "detailedNotes" sections plus "keyConcepts" and a short "summary", without inventing structure that isn\'t implied. LEAVE EMPTY ([]) unless clearly present: "definitions", "formulas", "examFocus", "questionsToReview", "flashcards".',
 };
 
 const SYSTEM_PROMPT = `You are Voicen AI, an assistant that turns a student's spoken, informal explanation into organized study notes.
@@ -53,7 +55,7 @@ ${transcript}
 """
 
 Mode: ${mode}
-Mode-specific instructions: ${MODE_INSTRUCTIONS[mode]}
+Mode-specific instructions (follow these EXACTLY — each mode must produce a visibly different note, including which fields stay empty): ${MODE_INSTRUCTIONS[mode]}
 
 Return a single JSON object with exactly this shape:
 {

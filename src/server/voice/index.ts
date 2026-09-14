@@ -75,6 +75,35 @@ const voiceModule = new Module('voice', {
       }));
     },
 
+    getRecordings: async (_args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+
+      const notes = await dbNotes.fetch(
+        { userId: new ObjectId(user.id) },
+        { sort: { createdAt: 1 } }
+      );
+
+      // One entry per unique recording: several notes can share the same
+      // transcript (via Reuse) — keep only the oldest note per transcript.
+      const seen = new Map<string, (typeof notes)[number]>();
+      for (const note of notes) {
+        const transcript = (note.transcript ?? '').trim();
+        if (!transcript) continue;
+        if (!seen.has(transcript)) seen.set(transcript, note);
+      }
+
+      return Array.from(seen.entries())
+        .map(([transcript, note]) => ({
+          _id: note._id.toString(),
+          title: note.title,
+          mode: note.mode,
+          transcriptPreview: transcript.length > 240 ? `${transcript.slice(0, 240)}…` : transcript,
+          wordCount: transcript.split(/\s+/).length,
+          createdAt: note.createdAt,
+        }))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    },
+
     getNote: async (args: unknown, { user }: { user: UserInfo | null }) => {
       requireUser(user);
       const { noteId } = z.object({ noteId: z.string() }).parse(args);
@@ -134,6 +163,40 @@ const voiceModule = new Module('voice', {
 
       const note = await generateNoteFromTranscript(transcript, mode, apiKey, model);
       return note;
+    },
+
+    reuseRecording: async (args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+      const { noteId, mode } = z
+        .object({ noteId: z.string(), mode: studyModeSchema })
+        .parse(args);
+
+      const source = await dbNotes.requireOne({ _id: new ObjectId(noteId) });
+      if (source.userId.toString() !== user.id) {
+        throw new AuthError('Not authorized');
+      }
+
+      const transcript = (source.transcript ?? '').trim();
+      if (!transcript) {
+        throw new Error('This note has no saved recording transcript to reuse.');
+      }
+
+      const apiKey = voiceModule.getConfig('novitaApiKey');
+      const model = voiceModule.getConfig('novitaModel');
+
+      const generated = await generateNoteFromTranscript(transcript, mode, apiKey, model);
+
+      const now = new Date();
+      const { insertedId } = await dbNotes.insertOne({
+        userId: new ObjectId(user.id),
+        mode,
+        ...generated,
+        transcript,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      return { noteId: insertedId.toString() };
     },
 
     generateMeetingNote: async (args: unknown, { user }: { user: UserInfo | null }) => {

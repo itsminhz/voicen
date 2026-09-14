@@ -59,26 +59,21 @@ export default function NotePage() {
   const deleteMutation = useMutation({
     ...modelenceMutation('voice.deleteNote'),
   });
-  const generateMutation = useMutation({
-    ...modelenceMutation<GeneratedNote>('voice.generateNote'),
-  });
-  const saveMutation = useMutation({
-    ...modelenceMutation<{ noteId: string }>('voice.saveNote'),
+  const reuseMutation = useMutation({
+    ...modelenceMutation<{ noteId: string }>('voice.reuseRecording'),
   });
 
   const [showReuse, setShowReuse] = useState(false);
   const [reuseMode, setReuseMode] = useState<StudyMode>('flashcards');
-  const isReusing = generateMutation.isPending || saveMutation.isPending;
+  const isReusing = reuseMutation.isPending;
 
   async function handleReuse() {
-    const transcript = data?.transcript?.trim();
-    if (!transcript) {
+    if (!noteId || !data?.transcript?.trim()) {
       toast.error('This note has no saved transcript to reuse.');
       return;
     }
     try {
-      const generated = await generateMutation.mutateAsync({ transcript, mode: reuseMode });
-      const result = await saveMutation.mutateAsync({ ...generated, mode: reuseMode, transcript });
+      const result = await reuseMutation.mutateAsync({ noteId, mode: reuseMode });
       toast.success('New note created from this recording!');
       isFirstLoad.current = true;
       setNote(null);

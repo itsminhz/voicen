@@ -503,11 +503,23 @@ up you agree to the Terms." caption, no subtitle, no demo caption line). Demo
 login only ever calls `loginWithPassword` with the fixed demo@modelence.dev
 credentials — it is one shared persistent account, never creates a new one.
 
-**Reuse feature (Sep 14):** NotePage has a "Reuse" outline button (shown when the
-note has a transcript) that opens a panel with ModeSelector; it regenerates the
-saved transcript into a new note style via the existing `voice.generateNote` +
-`voice.saveNote` mutations and navigates to the new note. No server changes —
-notes already persist transcript/title/createdAt in the `voiceNotes` Store.
+**Reuse feature (Sep 14):** server mutation `voice.reuseRecording({noteId, mode})`
+loads the source note's transcript server-side, generates + saves a new note,
+returns `{noteId}`. Used by both NotePage's "Reuse" panel and the Voices page.
+
+**Voices page (Sep 14):** `/voices` (VoicesPage.tsx) lists saved recordings via
+`voice.getRecordings` query — dedupes notes by identical transcript (keeps the
+oldest note per transcript, since Reuse copies the transcript into new notes),
+returns title/mode/240-char preview/wordCount/createdAt. Each card has an inline
+Reuse panel (ModeSelector → `voice.reuseRecording` → navigate to new note).
+Header (Page.tsx) now shows "Voices" and "Notes" nav pills for logged-in users
+(icons only on mobile; active state via pathname).
+
+**Mode differentiation fix (Sep 14):** MODE_INSTRUCTIONS in novita.ts now use
+explicit FILL / LEAVE EMPTY field lists per mode so flashcards/exam/summary etc.
+produce visibly different notes. NoteView no longer renders empty sections in
+edit mode — empty sections are offered as "+ Section" ghost-button chips at the
+bottom that seed one blank item.
 
 This app ("VoiceNote AI") is an AI voice note / study assistant. Design identity
 is established (see `DESIGN.md`): warm "calm notebook" palette (cream/ink/amber),

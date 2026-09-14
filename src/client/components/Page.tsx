@@ -9,6 +9,7 @@ import { Mic } from 'lucide-react';
 import LoadingSpinner from '@/client/components/LoadingSpinner';
 import { Seo, type SeoProps } from '@/client/components/Seo';
 import { Button } from '@/client/components/ui/Button';
+import UserMenu from '@/client/components/UserMenu';
 import { cn } from '@/client/lib/utils';
 
 interface PageProps {
@@ -29,7 +30,7 @@ function Header() {
           <Mic className="w-4 h-4" strokeWidth={2.25} />
         </span>
         <span className="text-[15px] font-semibold tracking-tight text-ink">
-          VoiceNote <span className="text-ink-faint">AI</span>
+          Voicen <span className="text-ink-faint">AI</span>
         </span>
       </Link>
 
@@ -38,11 +39,7 @@ function Header() {
           <span className="text-sm text-ink-soft hidden sm:inline">
             {user.handle}
           </span>
-          <Link to="/logout">
-            <Button variant="outline" color="neutral">
-              Logout
-            </Button>
-          </Link>
+          <UserMenu />
         </div>
       ) : (
         <div className="flex items-center gap-2">

@@ -23,10 +23,10 @@ export interface SeoConfig {
   formatTitle: (title?: string) => string;
 }
 
-const siteName = 'VoiceNote AI';
+const siteName = 'Voicen AI';
 
 const description =
-  'Stop typing your notes. Speak naturally and VoiceNote AI turns your voice into organized study notes, flashcards, and quizzes.';
+  'Stop typing your notes. Speak naturally and Voicen AI turns your voice into organized study notes, flashcards, and quizzes.';
 
 export const seoConfig: SeoConfig = {
   siteName,

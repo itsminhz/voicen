@@ -28,7 +28,7 @@ function Landing() {
           Speak it. <span className="text-ink-faint">We'll write it.</span>
         </h1>
         <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-ink-soft">
-          VoiceNote AI turns your voice into organized notes — study notes for students,
+          Voicen AI turns your voice into organized notes — study notes for students,
           structured minutes for meetings, and clean lists for everything else.
         </p>
         <div className="mt-9 flex items-center justify-center gap-3">

@@ -389,6 +389,18 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   delete). stickyTypes.ts holds client color→Tailwind pastel class map.
   Dashboard WORKSPACE_MODES sticky card now links to /stickies.
 
+**Branding & profile (2026-09-14):**
+- App renamed to **Voicen AI** (was VoiceNote AI); user plans to attach domain
+  voicen.xyz. Renamed in seo.config.ts, Page.tsx header, HomePage copy, and
+  all Novita system prompts.
+- Default avatars: `src/client/assets/avatar-male.png` / `avatar-female.png`
+  (user-provided cartoon avatars). New `profile` module
+  (src/server/profile/index.ts): `userProfiles` Store (userId unique, gender
+  enum male/female), query `profile.get`, mutation `profile.setGender`
+  (upsertOne). Header shows avatar via `UserMenu.tsx` (dropdown: pick
+  male/female avatar with optimistic update + logout link). Default when
+  unset: male avatar.
+
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.
 - Novita kimi-k3 confirmed working BUT intermittently returns 429 `server_overload` → novita.ts retries up to 3x with backoff. kimi-k3 is a reasoning model (`reasoning_content` separate from `content`) → `max_tokens: 8000` set to avoid empty content on `finish_reason: length`.

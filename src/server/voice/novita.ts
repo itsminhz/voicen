@@ -36,7 +36,7 @@ const MODE_INSTRUCTIONS: Record<StudyMode, string> = {
     'The transcript is unstructured, rambling speech. Your main job is to find the underlying structure and organize it clearly into logical "detailedNotes" sections and "keyConcepts", without inventing structure that isn\'t implied by the content.',
 };
 
-const SYSTEM_PROMPT = `You are VoiceNote AI, an assistant that turns a student's spoken, informal explanation into organized study notes.
+const SYSTEM_PROMPT = `You are Voicen AI, an assistant that turns a student's spoken, informal explanation into organized study notes.
 
 Rules you must follow strictly:
 - The transcript is the primary source of truth. Do not invent facts, examples, or corrections that are not implied by the transcript.
@@ -252,7 +252,7 @@ export interface GeneratedMeetingNote {
   additionalContext?: string;
 }
 
-const MEETING_SYSTEM_PROMPT = `You are VoiceNote AI, an assistant that turns a transcribed meeting or conversation into professional, structured meeting notes.
+const MEETING_SYSTEM_PROMPT = `You are Voicen AI, an assistant that turns a transcribed meeting or conversation into professional, structured meeting notes.
 
 Rules you must follow strictly:
 - The transcript is the only source of truth. Do not invent participants, decisions, dates, or tasks that were not stated or clearly implied.
@@ -339,7 +339,7 @@ export interface GeneratedSticky {
   items: { text: string; done: boolean }[];
 }
 
-const STICKY_SYSTEM_PROMPT = `You are VoiceNote AI, an assistant that turns rambling spoken thoughts into clean, Google Keep-style sticky note lists.
+const STICKY_SYSTEM_PROMPT = `You are Voicen AI, an assistant that turns rambling spoken thoughts into clean, Google Keep-style sticky note lists.
 
 Rules you must follow strictly:
 - The transcript is the only source of truth. Do not invent items that were not mentioned.

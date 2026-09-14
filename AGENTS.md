@@ -389,6 +389,17 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   delete). stickyTypes.ts holds client color→Tailwind pastel class map.
   Dashboard WORKSPACE_MODES sticky card now links to /stickies.
 
+**Dashboard v2 (2026-09-14):**
+- HomePage Dashboard redesigned: date + greeting header with "Start recording";
+  4 stat cards (total notes / study / meetings / sticky lists); 3 colored mode
+  tiles (violet=Student, sky=Meetings, amber=Sticky) with hover arrow; main
+  grid = recent-notes list card with All/Study/Meetings tab filter (NoteRow:
+  icon chip, title, summary, mode badge, timeAgo, open-action-items pill) +
+  right rail with "Open action items" widget (links to meeting notes with
+  open items) and "Sticky lists" mini colored previews (top 4, → /stickies).
+- Server getNotes now returns `openActionItems` count per note (NoteSummary
+  updated accordingly).
+
 **Branding & profile (2026-09-14):**
 - App renamed to **Voicen AI** (was VoiceNote AI); user plans to attach domain
   voicen.xyz. Renamed in seo.config.ts, Page.tsx header, HomePage copy, and

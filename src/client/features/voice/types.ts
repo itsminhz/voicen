@@ -63,6 +63,7 @@ export interface NoteSummary {
   subject: string | null;
   tags: string[];
   summary: string;
+  openActionItems: number;
   createdAt: string;
   updatedAt: string;
 }

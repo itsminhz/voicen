@@ -69,6 +69,7 @@ const voiceModule = new Module('voice', {
         subject: note.subject ?? null,
         tags: note.tags ?? [],
         summary: note.summary ?? '',
+        openActionItems: (note.actionItems ?? []).filter((item) => !item.done).length,
         createdAt: note.createdAt,
         updatedAt: note.updatedAt,
       }));

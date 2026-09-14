@@ -102,7 +102,7 @@ function IconChip({
   );
 }
 
-type NotesFilter = 'all' | 'study' | 'meeting';
+type NotesFilter = 'all' | 'study' | 'meeting' | 'sticky';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -136,7 +136,11 @@ function Dashboard() {
   const stickyCount = stickies?.length ?? 0;
 
   const filtered = allNotes.filter((n) =>
-    filter === 'all' ? true : filter === 'meeting' ? n.mode === 'meeting' : n.mode !== 'meeting'
+    filter === 'all' || filter === 'sticky'
+      ? true
+      : filter === 'meeting'
+        ? n.mode === 'meeting'
+        : n.mode !== 'meeting'
   );
   const recentNotes = filtered.slice(0, 6);
   const actionNotes = allNotes.filter((n) => (n.openActionItems ?? 0) > 0).slice(0, 4);
@@ -222,6 +226,7 @@ function Dashboard() {
                   { key: 'all', label: 'All' },
                   { key: 'study', label: 'Study' },
                   { key: 'meeting', label: 'Meetings' },
+                  { key: 'sticky', label: 'Sticky' },
                 ] as const
               ).map((tab) => (
                 <button
@@ -239,7 +244,7 @@ function Dashboard() {
               ))}
             </div>
             <Link
-              to="/notes"
+              to={filter === 'sticky' ? '/stickies' : '/notes'}
               className="inline-flex items-center gap-1 text-sm font-medium text-ink transition-colors hover:text-ink-soft"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />
@@ -247,7 +252,34 @@ function Dashboard() {
           </div>
 
           <Card className="rounded-3xl overflow-hidden">
-            {notesLoading ? (
+            {filter === 'sticky' ? (
+              stickiesLoading ? (
+                <div className="space-y-3 p-4">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-14 animate-pulse rounded-lg bg-paper-dim" />
+                  ))}
+                </div>
+              ) : stickyCount === 0 ? (
+                <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-paper-dim text-ink-faint">
+                    <StickyNote className="h-4.5 w-4.5" />
+                  </span>
+                  <p className="text-sm text-ink-soft">You haven't created any sticky lists yet.</p>
+                  <Link to="/stickies">
+                    <Button size="sm" variant="outline">
+                      <Plus className="mr-1 h-3.5 w-3.5" />
+                      Create one
+                    </Button>
+                  </Link>
+                </CardContent>
+              ) : (
+                <CardContent className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
+                  {(stickies ?? []).slice(0, 6).map((sticky) => (
+                    <MiniSticky key={sticky._id} sticky={sticky} />
+                  ))}
+                </CardContent>
+              )
+            ) : notesLoading ? (
               <div className="space-y-3 p-4">
                 {[0, 1, 2].map((i) => (
                   <div key={i} className="h-14 animate-pulse rounded-lg bg-paper-dim" />

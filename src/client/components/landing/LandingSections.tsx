@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 
 const SKY = '#0ea5e9';
-const SKY_GRADIENT = 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)';
 
 function Serif({ children }: { children: React.ReactNode }) {
   return (
@@ -108,11 +107,8 @@ export default function LandingSections() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
             {FEATURES.map((f) => (
               <div key={f.title} className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm">
-                <span
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md ring-4 ring-sky-100"
-                  style={{ background: SKY_GRADIENT }}
-                >
-                  <f.icon className="h-5.5 w-5.5" strokeWidth={1.75} />
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white">
+                  <f.icon className="h-5 w-5" strokeWidth={1.5} style={{ color: SKY }} />
                 </span>
                 <p className="mt-4 font-medium" style={{ fontSize: 12, color: SKY }}>
                   {f.tag}
@@ -162,11 +158,8 @@ export default function LandingSections() {
             {STEPS.map((s) => (
               <div key={s.step} className="rounded-2xl bg-[#f5f2ee] p-5">
                 <div className="flex items-center justify-between">
-                  <span
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md"
-                    style={{ background: SKY_GRADIENT }}
-                  >
-                    <s.icon className="h-4.5 w-4.5" strokeWidth={1.75} />
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white border border-neutral-200/70">
+                    <s.icon className="h-[18px] w-[18px]" strokeWidth={1.5} style={{ color: SKY }} />
                   </span>
                   <span className="text-neutral-400 font-medium" style={{ fontSize: 12 }}>
                     {s.step}

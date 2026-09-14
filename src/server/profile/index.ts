@@ -1,6 +1,6 @@
 import z from 'zod';
 import { AuthError } from 'modelence';
-import { Module, ObjectId, UserInfo, Store, schema } from 'modelence/server';
+import { Module, ObjectId, UserInfo, Store, schema, getConfig } from 'modelence/server';
 
 const GENDERS = ['male', 'female'] as const;
 
@@ -24,9 +24,14 @@ export default new Module('profile', {
         throw new AuthError('Not authenticated');
       }
       const profile = await dbProfiles.findOne({ userId: new ObjectId(user.id) });
+
+      // The shared demo account defaults to "Alex" until it sets its own name.
+      const demoEmail = getConfig('example.modelenceDemoUsername') as string;
+      const defaultName = user.handle === demoEmail ? 'Alex' : '';
+
       return {
         gender: profile?.gender ?? null,
-        displayName: profile?.displayName ?? '',
+        displayName: profile?.displayName || defaultName,
         bio: profile?.bio ?? '',
       };
     },

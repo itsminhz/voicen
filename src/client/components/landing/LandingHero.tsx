@@ -73,7 +73,7 @@ export default function LandingHero() {
 
             <Link
               to="/signup"
-              className="mt-6 sm:mt-8 inline-flex items-center gap-3 bg-[#0b0f1a] text-white rounded-full pl-6 sm:pl-7 pr-2 py-2 sm:py-2.5"
+              className="mt-6 sm:mt-8 inline-flex items-center gap-3 bg-[#0b0f1a] text-white rounded-full pl-6 sm:pl-7 pr-2 py-2 sm:py-2.5 transition-colors duration-200 hover:bg-[#0ea5e9]"
               style={{ fontSize: 14 }}
             >
               Get Started

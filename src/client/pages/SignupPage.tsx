@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { signupWithPassword } from 'modelence/client';
+import { getConfig, loginWithPassword, signupWithPassword } from 'modelence/client';
 import { Link } from 'react-router';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, UserRound } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import AuthLayout, { AuthSubmitButton, Serif } from '@/client/components/AuthLayout';
 import { Input } from '@/client/components/ui/Input';
@@ -10,6 +10,23 @@ import VerifyEmailNotice from '@/client/components/VerifyEmailNotice';
 
 export default function SignupPage() {
   const [signupEmail, setSignupEmail] = useState<string | null>(null);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
+  const handleDemoLogin = useCallback(async () => {
+    const email = getConfig('example.modelenceDemoUsername') as string | undefined;
+    const password = getConfig('example.modelenceDemoPassword') as string | undefined;
+    if (!email || !password) {
+      toast.error('Demo account is not available right now.');
+      return;
+    }
+    setIsDemoLoading(true);
+    try {
+      await loginWithPassword({ email, password });
+    } catch (error) {
+      console.error((error as Error).message);
+      setIsDemoLoading(false);
+    }
+  }, []);
 
   const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,6 +133,27 @@ export default function SignupPage() {
           </AuthSubmitButton>
         </div>
       </form>
+
+      {/* Demo account */}
+      <div className="mt-5">
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-line" />
+          <span className="text-xs text-ink-faint">or</span>
+          <span className="h-px flex-1 bg-line" />
+        </div>
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={isDemoLoading}
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface py-2.5 text-sm font-medium text-ink transition-colors hover:border-sky-300 hover:text-accent-dark disabled:opacity-60"
+        >
+          <UserRound className="h-4 w-4" strokeWidth={1.75} style={{ color: '#0ea5e9' }} />
+          {isDemoLoading ? 'Signing in as Alex…' : 'Continue with demo account'}
+        </button>
+        <p className="mt-2 text-center text-xs text-ink-faint">
+          Try Voicen instantly as <span className="font-medium text-ink-soft">Alex</span> — no signup needed.
+        </p>
+      </div>
     </AuthLayout>
   );
 }

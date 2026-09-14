@@ -383,6 +383,11 @@ copy made Voicen-relevant (same design): Notes created 128 +32 green / goal
 gauge 92% 128→140 / toggle Study notes|Meetings; form = Show figures for,
 Default note mode, Note goal 140, Recording goal 12; Voice minutes 47 +12 /
 Action items completed gauge 68% 17→25 / toggle Recordings|Sticky lists.
+Hero "Get Started" pill turns sky #0ea5e9 on hover. Signup page has a
+"Continue with demo account" button (divider + outline pill) that calls
+loginWithPassword with the public `example.modelenceDemoUsername/Password`
+configs; demo account is a normal persistent account. `profile.get` defaults
+displayName to "Alex" for the demo handle (until profile sets its own name).
 
 **Top-level workspace modes (product direction):** 3 modes —
 - Student (BUILT): 6-note-mode study flow at /new.

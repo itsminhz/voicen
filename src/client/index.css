@@ -82,6 +82,7 @@
    popups (Dialog, Select, Menu, Tooltip) layer above page content. */
 html {
   isolation: isolate;
+  scroll-behavior: smooth;
 }
 body {
   position: relative;

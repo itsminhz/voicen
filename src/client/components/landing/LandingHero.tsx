@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { ChevronRight } from 'lucide-react';
 import Navbar from './Navbar';
 import DashboardPreview from './DashboardPreview';
+import LandingSections from './LandingSections';
 
 const VIDEO_URL =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260424_064411_9e9d7f84-9277-41f4-ab10-59172d89e6be.mp4';
@@ -10,8 +11,9 @@ const POSTER_URL = 'https://images.unsplash.com/photo-1557683316-973673baf926?w=
 export default function LandingHero() {
   return (
     <div
-      className="min-h-screen w-full bg-[#ededed] p-3 sm:p-4"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      id="top"
+      className="min-h-screen w-full bg-[#ededed] p-3 sm:p-4 scroll-smooth"
+      style={{ fontFamily: "'Inter', sans-serif", scrollBehavior: 'smooth' }}
     >
       <div className="relative w-full h-[calc(100vh-24px)] sm:h-[calc(100vh-32px)] overflow-hidden bg-[#d9d9d9] rounded-2xl sm:rounded-3xl">
         {/* Background video */}
@@ -82,6 +84,8 @@ export default function LandingHero() {
           <DashboardPreview />
         </div>
       </div>
+
+      <LandingSections />
     </div>
   );
 }

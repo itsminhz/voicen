@@ -23,10 +23,10 @@ function FlowerLogo() {
 }
 
 const NAV_ITEMS = [
-  { label: 'Home', dot: true },
-  { label: 'Features' },
-  { label: 'About' },
-  { label: 'Modes', accent: true, chevron: true },
+  { label: 'Home', href: '#top', dot: true },
+  { label: 'Features', href: '#features' },
+  { label: 'About', href: '#about' },
+  { label: 'Modes', href: '#features', accent: true, chevron: true },
 ];
 
 export default function Navbar() {
@@ -44,8 +44,7 @@ export default function Navbar() {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.label}
-              href="#"
-              onClick={(e) => e.preventDefault()}
+              href={item.href}
               className={
                 item.accent
                   ? 'inline-flex items-center gap-0.5 font-medium'
@@ -94,8 +93,8 @@ export default function Navbar() {
             {NAV_ITEMS.map((item) => (
               <a
                 key={item.label}
-                href="#"
-                onClick={(e) => e.preventDefault()}
+                href={item.href}
+                onClick={() => setOpen(false)}
                 className="flex items-center gap-2 rounded-xl px-3 py-2.5 font-medium hover:bg-neutral-50"
                 style={{ fontSize: 14, color: item.accent ? '#ef4d23' : '#262626' }}
               >

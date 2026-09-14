@@ -4,7 +4,7 @@ import { logout } from 'modelence/client';
 export default function LogoutPage() {
   useEffect(() => {
     logout().then(() => {
-      window.location.href = '/login';
+      window.location.href = '/';
     });
   }, []);
 

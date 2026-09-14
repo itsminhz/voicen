@@ -431,7 +431,14 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   dropdown, orange "Get early access" → /signup), DashboardPreview.tsx
   (#f5f2ee tray, 3 cards: Notes gauge 92%, settings form, Voice Minutes gauge
   68%), Gauge.tsx (40-tick 180° SVG arc). Fonts Inter + Instrument Serif
-  imported in index.css. Nav links are decorative (preventDefault).
+  imported in index.css.
+- Landing completed: LandingSections.tsx below the hero — #features (3 mode
+  cards w/ orange icon chips + bullet points), #about "How it works" white
+  card with 4 steps on #f5f2ee tiles, dark #0b0f1a CTA band (Get early access
+  + Log in), footer (voicen.xyz, Features/About/Terms links, copyright).
+  Navbar links now real anchors (#top/#features/#about); html has
+  scroll-behavior smooth. LogoutPage now redirects to '/' (was /login) so
+  logged-out users land on the landing page.
 
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.

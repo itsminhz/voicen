@@ -1,6 +1,6 @@
-import { BookOpen, Sparkles, GraduationCap, Layers, ListChecks, Shuffle } from 'lucide-react';
+import { BookOpen, Sparkles, GraduationCap, Layers, ListChecks, Shuffle, Users } from 'lucide-react';
 
-export const NOTE_MODES = [
+export const STUDY_MODES = [
   'lecture',
   'quick_summary',
   'exam',
@@ -9,6 +9,9 @@ export const NOTE_MODES = [
   'brain_dump',
 ] as const;
 
+export const NOTE_MODES = [...STUDY_MODES, 'meeting'] as const;
+
+export type StudyMode = (typeof STUDY_MODES)[number];
 export type NoteMode = (typeof NOTE_MODES)[number];
 
 export const MODE_META: Record<NoteMode, { label: string; description: string; icon: typeof BookOpen }> = {
@@ -41,5 +44,10 @@ export const MODE_META: Record<NoteMode, { label: string; description: string; i
     label: 'Brain Dump',
     description: 'Unstructured rambling, organized into logical sections.',
     icon: Shuffle,
+  },
+  meeting: {
+    label: 'Meeting',
+    description: 'Summary, action items and key decisions from a conversation.',
+    icon: Users,
   },
 };

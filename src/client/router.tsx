@@ -100,6 +100,10 @@ const privateRoutes: RouteObject[] = [
     Component: lazy(() => import('./pages/NewNotePage'))
   },
   {
+    path: '/meeting',
+    Component: lazy(() => import('./pages/NewMeetingPage'))
+  },
+  {
     path: '/notes',
     Component: lazy(() => import('./pages/NotesPage'))
   },

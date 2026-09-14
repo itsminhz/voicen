@@ -3,20 +3,18 @@ import { useNavigate } from 'react-router';
 import { useMutation } from '@tanstack/react-query';
 import { modelenceMutation } from '@modelence/react-query';
 import { toast } from 'react-hot-toast';
-import { Mic, PenLine, RefreshCcw, ArrowRight, Save, AlertCircle, GraduationCap } from 'lucide-react';
+import { Mic, PenLine, RefreshCcw, ArrowRight, Save, AlertCircle, Users } from 'lucide-react';
 import Page from '@/client/components/Page';
 import { Card, CardContent } from '@/client/components/ui/Card';
 import { Button } from '@/client/components/ui/Button';
 import { Textarea } from '@/client/components/ui/Textarea';
 import MicButton from '@/client/features/voice/MicButton';
 import Waveform from '@/client/features/voice/Waveform';
-import ModeSelector from '@/client/features/voice/ModeSelector';
 import ProcessingStage, { type ProcessingPhase } from '@/client/features/voice/ProcessingStage';
-import NoteView from '@/client/features/voice/NoteView';
+import MeetingNoteView from '@/client/features/voice/MeetingNoteView';
 import { useVoiceRecorder, MAX_RECORDING_SECONDS } from '@/client/features/voice/useVoiceRecorder';
 import { blobToBase64 } from '@/client/lib/wav';
-import type { StudyMode } from '@/client/features/voice/modes';
-import type { GeneratedNote } from '@/client/features/voice/types';
+import type { GeneratedMeetingNote } from '@/client/features/voice/types';
 
 type Step = 'record' | 'transcript' | 'processing' | 'preview';
 
@@ -26,22 +24,21 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export default function NewNotePage() {
+export default function NewMeetingPage() {
   const navigate = useNavigate();
   const recorder = useVoiceRecorder();
   const [step, setStep] = useState<Step>('record');
   const [inputTab, setInputTab] = useState<'speak' | 'type'>('speak');
   const [transcript, setTranscript] = useState('');
-  const [mode, setMode] = useState<StudyMode>('lecture');
   const [phase, setPhase] = useState<ProcessingPhase>('transcribing');
-  const [note, setNote] = useState<GeneratedNote | null>(null);
+  const [note, setNote] = useState<GeneratedMeetingNote | null>(null);
   const [transcribeError, setTranscribeError] = useState<string | null>(null);
 
   const transcribeMutation = useMutation({
     ...modelenceMutation<{ transcript: string }>('voice.transcribeAudio'),
   });
   const generateMutation = useMutation({
-    ...modelenceMutation<GeneratedNote>('voice.generateNote'),
+    ...modelenceMutation<GeneratedMeetingNote>('voice.generateMeetingNote'),
   });
   const saveMutation = useMutation({
     ...modelenceMutation<{ noteId: string }>('voice.saveNote'),
@@ -70,17 +67,17 @@ export default function NewNotePage() {
 
   async function handleGenerate() {
     if (!transcript.trim()) {
-      toast.error('Please add some content before generating notes.');
+      toast.error('Please add a conversation transcript before generating.');
       return;
     }
     setStep('processing');
     setPhase('organizing');
     try {
-      const result = await generateMutation.mutateAsync({ transcript, mode });
+      const result = await generateMutation.mutateAsync({ transcript });
       setNote(result);
       setStep('preview');
     } catch (err: any) {
-      toast.error(err?.message || 'Could not generate notes. Please try again.');
+      toast.error(err?.message || 'Could not generate meeting notes. Please try again.');
       setStep('transcript');
     }
   }
@@ -89,11 +86,11 @@ export default function NewNotePage() {
     if (!note) return;
     setPhase('saving');
     try {
-      const result = await saveMutation.mutateAsync({ ...note, mode, transcript });
-      toast.success('Note saved!');
+      const result = await saveMutation.mutateAsync({ ...note, mode: 'meeting', transcript });
+      toast.success('Meeting notes saved!');
       navigate(`/notes/${result.noteId}`);
     } catch (err: any) {
-      toast.error(err?.message || 'Could not save the note. Please try again.');
+      toast.error(err?.message || 'Could not save the meeting notes. Please try again.');
     }
   }
 
@@ -106,16 +103,18 @@ export default function NewNotePage() {
   }
 
   return (
-    <Page seo={{ title: 'New Voice Note' }} className="max-w-3xl mx-auto w-full">
+    <Page seo={{ title: 'New Meeting Note' }} className="max-w-3xl mx-auto w-full">
       <div className="space-y-6 animate-fade-in">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-ink">New Voice Note</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-ink">New Meeting Note</h1>
             <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-ink-soft">
-              <GraduationCap className="h-3 w-3" /> Student
+              <Users className="h-3 w-3" /> Meetings
             </span>
           </div>
-          <p className="mt-1 text-sm text-ink-soft">Speak your thoughts and let AI organize them into study notes.</p>
+          <p className="mt-1 text-sm text-ink-soft">
+            Record the conversation — AI extracts the summary, action items and key decisions.
+          </p>
         </div>
 
         {step === 'record' && (
@@ -129,7 +128,7 @@ export default function NewNotePage() {
                     inputTab === 'speak' ? 'bg-surface text-ink shadow-sm' : 'text-ink-soft'
                   }`}
                 >
-                  <Mic className="mr-1.5 inline h-4 w-4" /> Speak
+                  <Mic className="mr-1.5 inline h-4 w-4" /> Record
                 </button>
                 <button
                   type="button"
@@ -138,7 +137,7 @@ export default function NewNotePage() {
                     inputTab === 'type' ? 'bg-surface text-ink shadow-sm' : 'text-ink-soft'
                   }`}
                 >
-                  <PenLine className="mr-1.5 inline h-4 w-4" /> Write
+                  <PenLine className="mr-1.5 inline h-4 w-4" /> Paste transcript
                 </button>
               </div>
 
@@ -176,12 +175,14 @@ export default function NewNotePage() {
                           {formatTime(recorder.seconds)}{' '}
                           <span className="text-ink-faint">/ {formatTime(MAX_RECORDING_SECONDS)}</span>
                         </p>
-                        <p className="mt-1 text-sm text-ink-soft">Listening... tap to stop</p>
+                        <p className="mt-1 text-sm text-ink-soft">Recording the conversation... tap to stop</p>
                       </>
                     ) : recorder.status === 'requesting' ? (
                       <p className="text-sm text-ink-soft">Requesting microphone access...</p>
                     ) : (
-                      <p className="text-sm text-ink-soft">Tap the mic and start speaking</p>
+                      <p className="text-sm text-ink-soft">
+                        Tap to record — place the device where it can hear everyone
+                      </p>
                     )}
                   </div>
                   {recorder.status === 'recording' && <Waveform levels={recorder.levels} />}
@@ -190,7 +191,7 @@ export default function NewNotePage() {
                 <div className="space-y-4 py-2">
                   <Textarea
                     rows={8}
-                    placeholder="Type or paste your notes here..."
+                    placeholder="Paste a meeting transcript or type what was discussed..."
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
                   />
@@ -214,7 +215,7 @@ export default function NewNotePage() {
           <div className="space-y-6 animate-slide-up">
             <Card>
               <CardContent className="space-y-3 p-6">
-                <h2 className="font-display text-lg font-semibold text-ink">Review your transcript</h2>
+                <h2 className="text-lg font-semibold text-ink">Review the transcript</h2>
                 <Textarea
                   rows={10}
                   value={transcript}
@@ -227,15 +228,8 @@ export default function NewNotePage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="space-y-4 p-6">
-                <h2 className="font-display text-lg font-semibold text-ink">Choose a note style</h2>
-                <ModeSelector value={mode} onChange={setMode} />
-              </CardContent>
-            </Card>
-
             <Button className="w-full" size="lg" rightIcon={<ArrowRight className="h-4 w-4" />} onClick={handleGenerate}>
-              Generate Notes
+              Generate Meeting Notes
             </Button>
           </div>
         )}
@@ -244,7 +238,7 @@ export default function NewNotePage() {
           <div className="space-y-6 animate-slide-up">
             <Card>
               <CardContent className="p-6">
-                <NoteView note={note} onChange={setNote} />
+                <MeetingNoteView note={note} onChange={setNote} />
               </CardContent>
             </Card>
             <div className="flex gap-3">
@@ -257,7 +251,7 @@ export default function NewNotePage() {
                 loading={saveMutation.isPending}
                 onClick={handleSave}
               >
-                Save Note
+                Save Meeting Notes
               </Button>
             </div>
           </div>

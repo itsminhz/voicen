@@ -1,6 +1,6 @@
 import { Store, schema } from 'modelence/server';
 
-export const NOTE_MODES = [
+export const STUDY_MODES = [
   'lecture',
   'quick_summary',
   'exam',
@@ -9,6 +9,9 @@ export const NOTE_MODES = [
   'brain_dump',
 ] as const;
 
+export const NOTE_MODES = [...STUDY_MODES, 'meeting'] as const;
+
+export type StudyMode = (typeof STUDY_MODES)[number];
 export type NoteMode = (typeof NOTE_MODES)[number];
 
 const flashcardSchema = schema.object({
@@ -29,6 +32,13 @@ const formulaSchema = schema.object({
 const sectionSchema = schema.object({
   heading: schema.string(),
   content: schema.string(),
+});
+
+const actionItemSchema = schema.object({
+  text: schema.string(),
+  owner: schema.string().optional(),
+  due: schema.string().optional(),
+  done: schema.boolean(),
 });
 
 export const dbNotes = new Store('voiceNotes', {
@@ -52,6 +62,12 @@ export const dbNotes = new Store('voiceNotes', {
     questionsToReview: schema.array(schema.string()).optional(),
     flashcards: schema.array(flashcardSchema).optional(),
     additionalContext: schema.string().optional(),
+
+    // Meeting mode fields
+    attendees: schema.array(schema.string()).optional(),
+    actionItems: schema.array(actionItemSchema).optional(),
+    decisions: schema.array(schema.string()).optional(),
+    followUps: schema.array(schema.string()).optional(),
 
     createdAt: schema.date(),
     updatedAt: schema.date(),

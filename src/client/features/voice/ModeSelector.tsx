@@ -1,9 +1,9 @@
 import { cn } from '@/client/lib/utils';
-import { NOTE_MODES, MODE_META, type NoteMode } from './modes';
+import { STUDY_MODES, MODE_META, type StudyMode } from './modes';
 
 interface ModeSelectorProps {
-  value: NoteMode;
-  onChange: (mode: NoteMode) => void;
+  value: StudyMode;
+  onChange: (mode: StudyMode) => void;
   compact?: boolean;
 }
 
@@ -15,7 +15,7 @@ export default function ModeSelector({ value, onChange, compact = false }: ModeS
         compact ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
       )}
     >
-      {NOTE_MODES.map((mode) => {
+      {STUDY_MODES.map((mode) => {
         const meta = MODE_META[mode];
         const Icon = meta.icon;
         const selected = value === mode;

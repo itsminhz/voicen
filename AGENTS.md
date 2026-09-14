@@ -363,11 +363,18 @@ names in index.css (`paper`, `ink`, `accent`, `line`, ...) — only values were
 remapped, so components didn't need class changes. Recording state uses `danger`
 (red). Card = rounded-xl border-line.
 
-**Top-level workspace modes (product direction):** 3 modes — Student (built:
-the existing 6-note-mode study flow at /new), Meetings (transcribe conversation
-→ summary + action items + key decisions; NOT BUILT YET, placeholder card on
-dashboard), Sticky Notes (voice → Keep-style checkable lists; NOT BUILT YET,
-placeholder; user hasn't answered detail question about list format yet).
+**Top-level workspace modes (product direction):** 3 modes —
+- Student (BUILT): 6-note-mode study flow at /new.
+- Meetings (BUILT): /meeting page → record/paste transcript → `voice.generateMeetingNote`
+  mutation → GeneratedMeetingNote {title, tags, summary, attendees, keyConcepts(topics),
+  actionItems[{text,owner?,due?,done}], decisions, followUps, additionalContext?} →
+  saved with mode 'meeting' in voiceNotes. MeetingNoteView.tsx renders/edits it with
+  checkable action items (persisted via updateNote autosave in NotePage).
+  Server: STUDY_MODES vs NOTE_MODES (=STUDY_MODES+'meeting') split in db.ts and
+  client modes.ts; generateNote validates studyModeSchema; save/update accept
+  meeting fields (meetingFieldsZod).
+- Sticky Notes (NOT BUILT): voice → Keep-style checkable lists; placeholder on
+  dashboard; user hasn't answered detail question about list format yet.
 
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.

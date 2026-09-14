@@ -1,4 +1,4 @@
-import type { NoteMode } from './db';
+import type { StudyMode } from './db';
 
 const NOVITA_BASE_URL = 'https://api.novita.ai/openai';
 
@@ -21,7 +21,7 @@ export interface GeneratedNote {
   additionalContext?: string;
 }
 
-const MODE_INSTRUCTIONS: Record<NoteMode, string> = {
+const MODE_INSTRUCTIONS: Record<StudyMode, string> = {
   lecture:
     'Produce detailed, well-organized lecture notes. Break the material into logical sections in "detailedNotes". Be thorough but do not pad content that was not discussed.',
   quick_summary:
@@ -46,7 +46,7 @@ Rules you must follow strictly:
 - Write like a genuine student's study note, not a generic AI summary.
 - Output ONLY valid JSON matching the requested schema. No markdown, no commentary, no code fences.`;
 
-function buildUserPrompt(transcript: string, mode: NoteMode): string {
+function buildUserPrompt(transcript: string, mode: StudyMode): string {
   return `Transcript (from a student's spoken voice note):
 """
 ${transcript}
@@ -132,12 +132,11 @@ function normalizeNote(data: any): GeneratedNote {
   };
 }
 
-export async function generateNoteFromTranscript(
-  transcript: string,
-  mode: NoteMode,
+async function callNovita(
+  messages: { role: string; content: string }[],
   apiKey: string,
   model: string
-): Promise<GeneratedNote> {
+): Promise<string> {
   if (!apiKey) {
     throw new NoteGenerationError('AI note generation is not configured yet. Add your Novita API key in the dashboard config.');
   }
@@ -148,10 +147,7 @@ export async function generateNoteFromTranscript(
     // kimi-k3 is a reasoning model — it spends tokens on reasoning before the
     // answer, so give it generous headroom to avoid truncated/empty content.
     max_tokens: 8000,
-    messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: buildUserPrompt(transcript, mode) },
-    ],
+    messages,
   });
 
   // Novita intermittently returns 429 "server_overload" — retry with backoff.
@@ -213,11 +209,122 @@ export async function generateNoteFromTranscript(
     throw new NoteGenerationError('The AI did not return any notes. Please try again.');
   }
 
+  return content;
+}
+
+export async function generateNoteFromTranscript(
+  transcript: string,
+  mode: StudyMode,
+  apiKey: string,
+  model: string
+): Promise<GeneratedNote> {
+  const content = await callNovita(
+    [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: buildUserPrompt(transcript, mode) },
+    ],
+    apiKey,
+    model
+  );
+
   try {
     const parsed = extractJson(content);
     return normalizeNote(parsed);
   } catch (err) {
     console.error('[voice] Failed to parse Novita JSON response:', err, 'content snippet:', content.slice(0, 300));
+    throw new NoteGenerationError('We had trouble understanding the AI response. Please try again.');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Meeting mode
+// ---------------------------------------------------------------------------
+
+export interface GeneratedMeetingNote {
+  title: string;
+  tags: string[];
+  summary: string;
+  attendees: string[];
+  keyConcepts: string[]; // discussion topics
+  actionItems: { text: string; owner?: string; due?: string; done: boolean }[];
+  decisions: string[];
+  followUps: string[];
+  additionalContext?: string;
+}
+
+const MEETING_SYSTEM_PROMPT = `You are VoiceNote AI, an assistant that turns a transcribed meeting or conversation into professional, structured meeting notes.
+
+Rules you must follow strictly:
+- The transcript is the only source of truth. Do not invent participants, decisions, dates, or tasks that were not stated or clearly implied.
+- If ownership or deadlines of a task are unclear, leave "owner"/"due" null rather than guessing.
+- Attendee names should only be included when actually mentioned in the conversation.
+- Leave arrays empty ([]) when the transcript contains no such information. Do not pad with filler.
+- Write in clear, neutral, professional language.
+- Output ONLY valid JSON matching the requested schema. No markdown, no commentary, no code fences.`;
+
+function buildMeetingPrompt(transcript: string): string {
+  return `Transcript of a meeting / conversation (recorded and transcribed, speakers are not labeled):
+"""
+${transcript}
+"""
+
+Return a single JSON object with exactly this shape:
+{
+  "title": string,                      // short descriptive meeting title
+  "tags": string[],                     // 1-4 short topic tags
+  "summary": string,                    // 3-6 sentence overview of what was discussed
+  "attendees": string[],                // names of people mentioned as present/speaking, [] if none identifiable
+  "topics": string[],                   // main discussion topics covered
+  "actionItems": [{ "text": string, "owner": string | null, "due": string | null }],
+  "decisions": string[],                // decisions that were made
+  "followUps": string[],                // open questions / items to revisit next time
+  "additionalContext": string | null    // anything else worth noting, or null
+}
+
+Keep every field grounded in the transcript above.`;
+}
+
+export async function generateMeetingNoteFromTranscript(
+  transcript: string,
+  apiKey: string,
+  model: string
+): Promise<GeneratedMeetingNote> {
+  const content = await callNovita(
+    [
+      { role: 'system', content: MEETING_SYSTEM_PROMPT },
+      { role: 'user', content: buildMeetingPrompt(transcript) },
+    ],
+    apiKey,
+    model
+  );
+
+  try {
+    const data: any = extractJson(content);
+    return {
+      title: typeof data.title === 'string' && data.title.trim() ? data.title.trim() : 'Untitled Meeting',
+      tags: asStringArray(data.tags),
+      summary: typeof data.summary === 'string' ? data.summary.trim() : '',
+      attendees: asStringArray(data.attendees),
+      keyConcepts: asStringArray(data.topics),
+      actionItems: Array.isArray(data.actionItems)
+        ? data.actionItems
+            .filter((item: any) => item && typeof item.text === 'string' && item.text.trim())
+            .map((item: any) => ({
+              text: item.text.trim(),
+              owner: typeof item.owner === 'string' && item.owner.trim() ? item.owner.trim() : undefined,
+              due: typeof item.due === 'string' && item.due.trim() ? item.due.trim() : undefined,
+              done: false,
+            }))
+        : [],
+      decisions: asStringArray(data.decisions),
+      followUps: asStringArray(data.followUps),
+      additionalContext:
+        typeof data.additionalContext === 'string' && data.additionalContext.trim()
+          ? data.additionalContext.trim()
+          : undefined,
+    };
+  } catch (err) {
+    console.error('[voice] Failed to parse Novita meeting JSON:', err, 'content snippet:', content.slice(0, 300));
     throw new NoteGenerationError('We had trouble understanding the AI response. Please try again.');
   }
 }

@@ -1,9 +1,9 @@
 import z from 'zod';
 import { AuthError } from 'modelence';
 import { Module, ObjectId, UserInfo } from 'modelence/server';
-import { dbNotes, NOTE_MODES } from './db';
+import { dbNotes, NOTE_MODES, STUDY_MODES } from './db';
 import { transcribeAudioWav } from './assemblyai';
-import { generateNoteFromTranscript } from './novita';
+import { generateNoteFromTranscript, generateMeetingNoteFromTranscript } from './novita';
 
 function requireUser(user: UserInfo | null): asserts user is UserInfo {
   if (!user) {
@@ -12,6 +12,21 @@ function requireUser(user: UserInfo | null): asserts user is UserInfo {
 }
 
 const noteModeSchema = z.enum(NOTE_MODES);
+const studyModeSchema = z.enum(STUDY_MODES);
+
+const actionItemZod = z.object({
+  text: z.string(),
+  owner: z.string().optional(),
+  due: z.string().optional(),
+  done: z.boolean(),
+});
+
+const meetingFieldsZod = {
+  attendees: z.array(z.string()).optional(),
+  actionItems: z.array(actionItemZod).optional(),
+  decisions: z.array(z.string()).optional(),
+  followUps: z.array(z.string()).optional(),
+};
 
 const voiceModule = new Module('voice', {
   configSchema: {
@@ -87,13 +102,24 @@ const voiceModule = new Module('voice', {
     generateNote: async (args: unknown, { user }: { user: UserInfo | null }) => {
       requireUser(user);
       const { transcript, mode } = z
-        .object({ transcript: z.string().min(1), mode: noteModeSchema })
+        .object({ transcript: z.string().min(1), mode: studyModeSchema })
         .parse(args);
 
       const apiKey = voiceModule.getConfig('novitaApiKey');
       const model = voiceModule.getConfig('novitaModel');
 
       const note = await generateNoteFromTranscript(transcript, mode, apiKey, model);
+      return note;
+    },
+
+    generateMeetingNote: async (args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+      const { transcript } = z.object({ transcript: z.string().min(1) }).parse(args);
+
+      const apiKey = voiceModule.getConfig('novitaApiKey');
+      const model = voiceModule.getConfig('novitaModel');
+
+      const note = await generateMeetingNoteFromTranscript(transcript, apiKey, model);
       return note;
     },
 
@@ -117,6 +143,7 @@ const voiceModule = new Module('voice', {
           questionsToReview: z.array(z.string()).optional(),
           flashcards: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
           additionalContext: z.string().optional(),
+          ...meetingFieldsZod,
         })
         .parse(args);
 
@@ -150,6 +177,7 @@ const voiceModule = new Module('voice', {
           questionsToReview: z.array(z.string()).optional(),
           flashcards: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
           additionalContext: z.string().optional(),
+          ...meetingFieldsZod,
         })
         .parse(args);
 

@@ -20,6 +20,13 @@ export interface Flashcard {
   answer: string;
 }
 
+export interface ActionItem {
+  text: string;
+  owner?: string;
+  due?: string;
+  done: boolean;
+}
+
 export interface GeneratedNote {
   title: string;
   subject?: string;
@@ -34,6 +41,18 @@ export interface GeneratedNote {
   examFocus: string[];
   questionsToReview: string[];
   flashcards: Flashcard[];
+  additionalContext?: string;
+}
+
+export interface GeneratedMeetingNote {
+  title: string;
+  tags: string[];
+  summary: string;
+  attendees: string[];
+  keyConcepts: string[];
+  actionItems: ActionItem[];
+  decisions: string[];
+  followUps: string[];
   additionalContext?: string;
 }
 
@@ -54,4 +73,9 @@ export interface FullNote extends GeneratedNote {
   transcript: string;
   createdAt: string;
   updatedAt: string;
+  // Meeting mode fields
+  attendees?: string[];
+  actionItems?: ActionItem[];
+  decisions?: string[];
+  followUps?: string[];
 }

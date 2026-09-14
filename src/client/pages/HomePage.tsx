@@ -101,7 +101,8 @@ const WORKSPACE_MODES = [
     icon: Users,
     title: 'Meetings',
     description: 'Record a conversation — get a summary, action items and decisions.',
-    available: false,
+    to: '/meeting',
+    available: true,
   },
   {
     key: 'sticky',

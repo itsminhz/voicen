@@ -9,8 +9,9 @@ import { Card, CardContent } from '@/client/components/ui/Card';
 import { IconButton } from '@/client/components/ui/IconButton';
 import { Badge } from '@/client/components/ui/Badge';
 import NoteView from '@/client/features/voice/NoteView';
+import MeetingNoteView from '@/client/features/voice/MeetingNoteView';
 import { MODE_META } from '@/client/features/voice/modes';
-import type { FullNote, GeneratedNote } from '@/client/features/voice/types';
+import type { FullNote, GeneratedNote, GeneratedMeetingNote } from '@/client/features/voice/types';
 
 export default function NotePage() {
   const { noteId } = useParams<{ noteId: string }>();
@@ -22,14 +23,30 @@ export default function NotePage() {
   });
 
   const [note, setNote] = useState<GeneratedNote | null>(null);
+  const [meetingNote, setMeetingNote] = useState<GeneratedMeetingNote | null>(null);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isFirstLoad = useRef(true);
+  const isMeeting = data?.mode === 'meeting';
 
   useEffect(() => {
     if (data && isFirstLoad.current) {
-      const { _id, mode, transcript, createdAt, updatedAt, ...rest } = data;
-      setNote(rest);
+      if (data.mode === 'meeting') {
+        setMeetingNote({
+          title: data.title,
+          tags: data.tags ?? [],
+          summary: data.summary ?? '',
+          attendees: data.attendees ?? [],
+          keyConcepts: data.keyConcepts ?? [],
+          actionItems: data.actionItems ?? [],
+          decisions: data.decisions ?? [],
+          followUps: data.followUps ?? [],
+          additionalContext: data.additionalContext,
+        });
+      } else {
+        const { _id, mode, transcript, createdAt, updatedAt, ...rest } = data;
+        setNote(rest);
+      }
       isFirstLoad.current = false;
     }
   }, [data]);
@@ -41,20 +58,29 @@ export default function NotePage() {
     ...modelenceMutation('voice.deleteNote'),
   });
 
-  function handleChange(next: GeneratedNote) {
-    setNote(next);
+  function scheduleSave(payload: Record<string, unknown>) {
     setSaveState('saving');
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       if (!noteId) return;
       try {
-        await updateMutation.mutateAsync({ noteId, ...next });
+        await updateMutation.mutateAsync({ noteId, ...payload });
         setSaveState('saved');
       } catch (err: any) {
         toast.error(err?.message || 'Could not save changes');
         setSaveState('idle');
       }
     }, 800);
+  }
+
+  function handleChange(next: GeneratedNote) {
+    setNote(next);
+    scheduleSave({ ...next });
+  }
+
+  function handleMeetingChange(next: GeneratedMeetingNote) {
+    setMeetingNote(next);
+    scheduleSave({ ...next });
   }
 
   async function handleDelete() {
@@ -68,7 +94,9 @@ export default function NotePage() {
     }
   }
 
-  if (isLoading || !note) {
+  const activeTitle = isMeeting ? meetingNote?.title : note?.title;
+
+  if (isLoading || (!note && !meetingNote)) {
     return (
       <Page className="max-w-3xl mx-auto w-full">
         <div className="space-y-4">
@@ -82,7 +110,7 @@ export default function NotePage() {
   const meta = data ? MODE_META[data.mode] : null;
 
   return (
-    <Page seo={{ title: note.title }} className="max-w-3xl mx-auto w-full">
+    <Page seo={{ title: activeTitle ?? 'Note' }} className="max-w-3xl mx-auto w-full">
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <Link to="/notes" className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink">
@@ -115,7 +143,11 @@ export default function NotePage() {
 
         <Card>
           <CardContent className="p-6">
-            <NoteView note={note} onChange={handleChange} />
+            {isMeeting && meetingNote ? (
+              <MeetingNoteView note={meetingNote} onChange={handleMeetingChange} />
+            ) : note ? (
+              <NoteView note={note} onChange={handleChange} />
+            ) : null}
           </CardContent>
         </Card>
       </div>

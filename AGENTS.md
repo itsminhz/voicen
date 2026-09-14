@@ -503,6 +503,12 @@ up you agree to the Terms." caption, no subtitle, no demo caption line). Demo
 login only ever calls `loginWithPassword` with the fixed demo@modelence.dev
 credentials — it is one shared persistent account, never creates a new one.
 
+**Reuse feature (Sep 14):** NotePage has a "Reuse" outline button (shown when the
+note has a transcript) that opens a panel with ModeSelector; it regenerates the
+saved transcript into a new note style via the existing `voice.generateNote` +
+`voice.saveNote` mutations and navigates to the new note. No server changes —
+notes already persist transcript/title/createdAt in the `voiceNotes` Store.
+
 This app ("VoiceNote AI") is an AI voice note / study assistant. Design identity
 is established (see `DESIGN.md`): warm "calm notebook" palette (cream/ink/amber),
 Fraunces (display) + Karla (body).

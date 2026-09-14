@@ -3,14 +3,16 @@ import { useParams, useNavigate, Link } from 'react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { modelenceQuery, modelenceMutation } from '@modelence/react-query';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Check, Loader2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Loader2, Trash2, Recycle, Sparkles, X } from 'lucide-react';
 import Page from '@/client/components/Page';
 import { Card, CardContent } from '@/client/components/ui/Card';
+import { Button } from '@/client/components/ui/Button';
 import { IconButton } from '@/client/components/ui/IconButton';
 import { Badge } from '@/client/components/ui/Badge';
 import NoteView from '@/client/features/voice/NoteView';
 import MeetingNoteView from '@/client/features/voice/MeetingNoteView';
-import { MODE_META } from '@/client/features/voice/modes';
+import ModeSelector from '@/client/features/voice/ModeSelector';
+import { MODE_META, type StudyMode } from '@/client/features/voice/modes';
 import type { FullNote, GeneratedNote, GeneratedMeetingNote } from '@/client/features/voice/types';
 
 export default function NotePage() {
@@ -57,6 +59,36 @@ export default function NotePage() {
   const deleteMutation = useMutation({
     ...modelenceMutation('voice.deleteNote'),
   });
+  const generateMutation = useMutation({
+    ...modelenceMutation<GeneratedNote>('voice.generateNote'),
+  });
+  const saveMutation = useMutation({
+    ...modelenceMutation<{ noteId: string }>('voice.saveNote'),
+  });
+
+  const [showReuse, setShowReuse] = useState(false);
+  const [reuseMode, setReuseMode] = useState<StudyMode>('flashcards');
+  const isReusing = generateMutation.isPending || saveMutation.isPending;
+
+  async function handleReuse() {
+    const transcript = data?.transcript?.trim();
+    if (!transcript) {
+      toast.error('This note has no saved transcript to reuse.');
+      return;
+    }
+    try {
+      const generated = await generateMutation.mutateAsync({ transcript, mode: reuseMode });
+      const result = await saveMutation.mutateAsync({ ...generated, mode: reuseMode, transcript });
+      toast.success('New note created from this recording!');
+      isFirstLoad.current = true;
+      setNote(null);
+      setMeetingNote(null);
+      setShowReuse(false);
+      navigate(`/notes/${result.noteId}`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Could not generate a new note. Please try again.');
+    }
+  }
 
   function scheduleSave(payload: Record<string, unknown>) {
     setSaveState('saving');
@@ -129,6 +161,16 @@ export default function NotePage() {
                 </>
               )}
             </span>
+            {data?.transcript?.trim() && (
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Recycle className="h-3.5 w-3.5" />}
+                onClick={() => setShowReuse((v) => !v)}
+              >
+                Reuse
+              </Button>
+            )}
             <IconButton variant="ghost" color="destructive" size="sm" aria-label="Delete note" onClick={handleDelete}>
               <Trash2 className="h-4 w-4" />
             </IconButton>
@@ -139,6 +181,41 @@ export default function NotePage() {
           <div>
             <Badge color="neutral">{meta.label}</Badge>
           </div>
+        )}
+
+        {showReuse && (
+          <Card className="animate-slide-up">
+            <CardContent className="space-y-4 p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-lg font-semibold text-ink">
+                    Reuse this recording
+                  </h2>
+                  <p className="mt-1 text-sm text-ink-soft">
+                    The original transcript is saved with this note. Pick a style and generate a
+                    brand-new note from it — flashcards, exam notes, a study guide, and more.
+                  </p>
+                </div>
+                <IconButton
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Close reuse panel"
+                  onClick={() => setShowReuse(false)}
+                >
+                  <X className="h-4 w-4" />
+                </IconButton>
+              </div>
+              <ModeSelector value={reuseMode} onChange={setReuseMode} />
+              <Button
+                className="w-full"
+                leftIcon={<Sparkles className="h-4 w-4" />}
+                loading={isReusing}
+                onClick={handleReuse}
+              >
+                {isReusing ? 'Generating...' : `Generate ${MODE_META[reuseMode].label}`}
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         <Card>

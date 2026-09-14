@@ -1,4 +1,4 @@
-import type { StudyMode } from './db';
+import { STICKY_COLORS, type StudyMode, type StickyColor } from './db';
 
 const NOVITA_BASE_URL = 'https://api.novita.ai/openai';
 
@@ -326,5 +326,83 @@ export async function generateMeetingNoteFromTranscript(
   } catch (err) {
     console.error('[voice] Failed to parse Novita meeting JSON:', err, 'content snippet:', content.slice(0, 300));
     throw new NoteGenerationError('We had trouble understanding the AI response. Please try again.');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sticky Notes mode
+// ---------------------------------------------------------------------------
+
+export interface GeneratedSticky {
+  title: string;
+  color: StickyColor;
+  items: { text: string; done: boolean }[];
+}
+
+const STICKY_SYSTEM_PROMPT = `You are VoiceNote AI, an assistant that turns rambling spoken thoughts into clean, Google Keep-style sticky note lists.
+
+Rules you must follow strictly:
+- The transcript is the only source of truth. Do not invent items that were not mentioned.
+- Group related items into separate sticky notes with short, clear titles (e.g. "Groceries", "Weekend Plans", "Call List").
+- Each item should be a short, actionable or scannable phrase — clean up filler words, keep the meaning.
+- Create between 1 and 6 sticky notes depending on how many distinct topics the transcript actually contains. One topic = one note.
+- Pick a fitting color per note from: ${STICKY_COLORS.join(', ')}.
+- Output ONLY valid JSON matching the requested schema. No markdown, no commentary, no code fences.`;
+
+function buildStickyPrompt(transcript: string): string {
+  return `Transcript of spoken thoughts:
+"""
+${transcript}
+"""
+
+Return a single JSON object with exactly this shape:
+{
+  "notes": [
+    {
+      "title": string,           // short list title
+      "color": string,           // one of: ${STICKY_COLORS.join(', ')}
+      "items": string[]          // the list items, cleaned up
+    }
+  ]
+}
+
+Keep every item grounded in the transcript above.`;
+}
+
+export async function generateStickiesFromTranscript(
+  transcript: string,
+  apiKey: string,
+  model: string
+): Promise<GeneratedSticky[]> {
+  const content = await callNovita(
+    [
+      { role: 'system', content: STICKY_SYSTEM_PROMPT },
+      { role: 'user', content: buildStickyPrompt(transcript) },
+    ],
+    apiKey,
+    model
+  );
+
+  try {
+    const data: any = extractJson(content);
+    const notes = Array.isArray(data.notes) ? data.notes : [];
+    const stickies: GeneratedSticky[] = notes
+      .filter((n: any) => n && typeof n.title === 'string' && Array.isArray(n.items))
+      .map((n: any) => ({
+        title: n.title.trim() || 'Untitled',
+        color: (STICKY_COLORS as readonly string[]).includes(n.color) ? (n.color as StickyColor) : 'yellow',
+        items: n.items
+          .filter((item: any) => typeof item === 'string' && item.trim())
+          .map((item: string) => ({ text: item.trim(), done: false })),
+      }))
+      .filter((n: GeneratedSticky) => n.items.length > 0);
+
+    if (stickies.length === 0) {
+      throw new Error('No lists produced');
+    }
+    return stickies;
+  } catch (err) {
+    console.error('[voice] Failed to parse Novita sticky JSON:', err, 'content snippet:', content.slice(0, 300));
+    throw new NoteGenerationError('We could not turn that into lists. Please try again.');
   }
 }

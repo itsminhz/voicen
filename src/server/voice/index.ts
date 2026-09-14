@@ -1,9 +1,13 @@
 import z from 'zod';
 import { AuthError } from 'modelence';
 import { Module, ObjectId, UserInfo } from 'modelence/server';
-import { dbNotes, NOTE_MODES, STUDY_MODES } from './db';
+import { dbNotes, dbStickies, NOTE_MODES, STUDY_MODES, STICKY_COLORS } from './db';
 import { transcribeAudioWav } from './assemblyai';
-import { generateNoteFromTranscript, generateMeetingNoteFromTranscript } from './novita';
+import {
+  generateNoteFromTranscript,
+  generateMeetingNoteFromTranscript,
+  generateStickiesFromTranscript,
+} from './novita';
 
 function requireUser(user: UserInfo | null): asserts user is UserInfo {
   if (!user) {
@@ -47,7 +51,7 @@ const voiceModule = new Module('voice', {
     },
   },
 
-  stores: [dbNotes],
+  stores: [dbNotes, dbStickies],
 
   queries: {
     getNotes: async (_args: unknown, { user }: { user: UserInfo | null }) => {
@@ -80,6 +84,25 @@ const voiceModule = new Module('voice', {
       }
 
       return { ...note, _id: note._id.toString() };
+    },
+
+    getStickies: async (_args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+
+      const stickies = await dbStickies.fetch(
+        { userId: new ObjectId(user.id) },
+        { sort: { pinned: -1, updatedAt: -1 } }
+      );
+
+      return stickies.map((sticky) => ({
+        _id: sticky._id.toString(),
+        title: sticky.title,
+        color: sticky.color,
+        items: sticky.items,
+        pinned: sticky.pinned,
+        createdAt: sticky.createdAt,
+        updatedAt: sticky.updatedAt,
+      }));
     },
   },
 
@@ -121,6 +144,90 @@ const voiceModule = new Module('voice', {
 
       const note = await generateMeetingNoteFromTranscript(transcript, apiKey, model);
       return note;
+    },
+
+    generateStickies: async (args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+      const { transcript } = z.object({ transcript: z.string().min(1) }).parse(args);
+
+      const apiKey = voiceModule.getConfig('novitaApiKey');
+      const model = voiceModule.getConfig('novitaModel');
+
+      const stickies = await generateStickiesFromTranscript(transcript, apiKey, model);
+
+      const now = new Date();
+      const created = [];
+      for (const sticky of stickies) {
+        const { insertedId } = await dbStickies.insertOne({
+          userId: new ObjectId(user.id),
+          title: sticky.title,
+          color: sticky.color,
+          items: sticky.items,
+          pinned: false,
+          createdAt: now,
+          updatedAt: now,
+        });
+        created.push(insertedId.toString());
+      }
+
+      return { stickyIds: created, count: created.length };
+    },
+
+    createSticky: async (args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+      const { title, color } = z
+        .object({ title: z.string().default(''), color: z.enum(STICKY_COLORS).default('yellow') })
+        .parse(args ?? {});
+
+      const now = new Date();
+      const { insertedId } = await dbStickies.insertOne({
+        userId: new ObjectId(user.id),
+        title: title || 'New list',
+        color,
+        items: [],
+        pinned: false,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      return { stickyId: insertedId.toString() };
+    },
+
+    updateSticky: async (args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+      const { stickyId, ...rest } = z
+        .object({
+          stickyId: z.string(),
+          title: z.string().optional(),
+          color: z.enum(STICKY_COLORS).optional(),
+          items: z.array(z.object({ text: z.string(), done: z.boolean() })).optional(),
+          pinned: z.boolean().optional(),
+        })
+        .parse(args);
+
+      const sticky = await dbStickies.requireOne({ _id: new ObjectId(stickyId) });
+      if (sticky.userId.toString() !== user.id) {
+        throw new AuthError('Not authorized');
+      }
+
+      await dbStickies.updateOne(
+        { _id: new ObjectId(stickyId) },
+        { $set: { ...rest, updatedAt: new Date() } }
+      );
+      return { success: true };
+    },
+
+    deleteSticky: async (args: unknown, { user }: { user: UserInfo | null }) => {
+      requireUser(user);
+      const { stickyId } = z.object({ stickyId: z.string() }).parse(args);
+
+      const sticky = await dbStickies.requireOne({ _id: new ObjectId(stickyId) });
+      if (sticky.userId.toString() !== user.id) {
+        throw new AuthError('Not authorized');
+      }
+
+      await dbStickies.deleteOne({ _id: new ObjectId(stickyId) });
+      return { success: true };
     },
 
     saveNote: async (args: unknown, { user }: { user: UserInfo | null }) => {

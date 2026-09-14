@@ -41,6 +41,27 @@ const actionItemSchema = schema.object({
   done: schema.boolean(),
 });
 
+export const STICKY_COLORS = ['yellow', 'green', 'blue', 'pink', 'purple', 'orange', 'gray'] as const;
+export type StickyColor = (typeof STICKY_COLORS)[number];
+
+export const dbStickies = new Store('stickyNotes', {
+  schema: {
+    userId: schema.userId(),
+    title: schema.string(),
+    color: schema.enum(STICKY_COLORS),
+    items: schema.array(
+      schema.object({
+        text: schema.string(),
+        done: schema.boolean(),
+      })
+    ),
+    pinned: schema.boolean(),
+    createdAt: schema.date(),
+    updatedAt: schema.date(),
+  },
+  indexes: [{ key: { userId: 1, pinned: -1, updatedAt: -1 } }],
+});
+
 export const dbNotes = new Store('voiceNotes', {
   schema: {
     userId: schema.userId(),

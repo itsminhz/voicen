@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Pin, PinOff, Trash2, Plus, X, Palette } from 'lucide-react';
+import { Pin, Trash2, Plus, X, Palette } from 'lucide-react';
 import { cn } from '@/client/lib/utils';
 import { STICKY_COLORS, STICKY_COLOR_CLASSES, type Sticky, type StickyColor, type StickyItem } from './stickyTypes';
 

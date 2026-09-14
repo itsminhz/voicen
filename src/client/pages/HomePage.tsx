@@ -109,7 +109,8 @@ const WORKSPACE_MODES = [
     icon: StickyNote,
     title: 'Sticky Notes',
     description: 'Turn rambling thoughts into clean, checkable lists.',
-    available: false,
+    to: '/stickies',
+    available: true,
   },
 ] as const;
 

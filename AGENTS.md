@@ -373,8 +373,21 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   Server: STUDY_MODES vs NOTE_MODES (=STUDY_MODES+'meeting') split in db.ts and
   client modes.ts; generateNote validates studyModeSchema; save/update accept
   meeting fields (meetingFieldsZod).
-- Sticky Notes (NOT BUILT): voice → Keep-style checkable lists; placeholder on
-  dashboard; user hasn't answered detail question about list format yet.
+- Sticky Notes (BUILT): voice → AI splits speech into multiple Keep-style
+  colored checkable lists. Separate `stickyNotes` Store (db.ts: dbStickies,
+  STICKY_COLORS = yellow/green/blue/pink/purple/orange/gray; fields: userId,
+  title, color, items[{text,done}], pinned, createdAt, updatedAt).
+  Server: novita.ts `generateStickiesFromTranscript` (STICKY_SYSTEM_PROMPT:
+  1–6 lists, one topic per list, no invention); query `voice.getStickies`
+  (pinned desc, updatedAt desc); mutations generateStickies (insertMany),
+  createSticky (blank), updateSticky (title/color/items/pinned), deleteSticky.
+  Client: /stickies route → StickyBoardPage (record → transcribe →
+  generateStickies; "Type instead" textarea flow; "Blank list" button;
+  pinned/others 3-col grid; optimistic updates via setQueryData).
+  StickyCard.tsx = Keep-style card (editable title, checkable items with
+  inline edit/remove, add-item input, pin toggle, 7-color palette popover,
+  delete). stickyTypes.ts holds client color→Tailwind pastel class map.
+  Dashboard WORKSPACE_MODES sticky card now links to /stickies.
 
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.

@@ -6,20 +6,20 @@
 @source "./";
 
 @theme {
-  /* Clean light palette — shadcn-style white/zinc */
-  --color-paper: #fafafa;        /* page background (zinc-50) */
-  --color-paper-dim: #f4f4f5;    /* subtle fill (zinc-100) */
+  /* Landing-matched light palette (Voicen landing: #ededed page, white cards, sky accent) */
+  --color-paper: #ededed;        /* page background (matches landing frame) */
+  --color-paper-dim: #f5f2ee;    /* subtle warm fill (landing tray) */
   --color-surface: #ffffff;      /* cards / panels */
-  --color-ink: #18181b;          /* primary text (zinc-900) */
-  --color-ink-soft: #52525b;     /* secondary text (zinc-600) */
-  --color-ink-faint: #a1a1aa;    /* muted text (zinc-400) */
-  --color-line: #e4e4e7;         /* borders (zinc-200) */
-  --color-line-soft: #f1f1f3;    /* faint borders / dividers */
+  --color-ink: #171717;          /* primary text (neutral-900) */
+  --color-ink-soft: #525252;     /* secondary text (neutral-600) */
+  --color-ink-faint: #a3a3a3;    /* muted text (neutral-400) */
+  --color-line: #e5e5e5;         /* borders (neutral-200) */
+  --color-line-soft: #f0f0f0;    /* faint borders / dividers */
 
-  /* Primary action — shadcn black-button look */
-  --color-accent: #18181b;
-  --color-accent-soft: #f4f4f5;
-  --color-accent-dark: #09090b;
+  /* Primary action — landing sky */
+  --color-accent: #0ea5e9;
+  --color-accent-soft: #e0f2fe;
+  --color-accent-dark: #0284c7;
   --color-accent-contrast: #ffffff;
 
   --color-success: #16a34a;
@@ -27,12 +27,13 @@
   --color-danger: #dc2626;
   --color-danger-soft: #fee2e2;
 
-  --font-display: 'Geist', 'Segoe UI', sans-serif;
-  --font-body: 'Geist', 'Segoe UI', sans-serif;
+  --font-display: 'Inter', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
 
   --animate-fade-in: fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-slide-up: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;

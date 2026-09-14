@@ -53,30 +53,54 @@ const WORKSPACE_MODES = [
     key: 'student',
     icon: GraduationCap,
     title: 'Student',
+    tag: 'Study smarter',
     description: 'Study notes, flashcards & exam prep from your voice.',
     to: '/new',
-    chip: 'bg-violet-100 text-violet-700',
-    ring: 'group-hover:border-violet-300',
   },
   {
     key: 'meetings',
     icon: Users,
     title: 'Meetings',
+    tag: 'Never miss a decision',
     description: 'Summaries with action items and key decisions.',
     to: '/meeting',
-    chip: 'bg-sky-100 text-sky-700',
-    ring: 'group-hover:border-sky-300',
   },
   {
     key: 'sticky',
     icon: StickyNote,
     title: 'Sticky Notes',
+    tag: 'Lists from rambling',
     description: 'Rambling thoughts become clean, checkable lists.',
     to: '/stickies',
-    chip: 'bg-amber-100 text-amber-700',
-    ring: 'group-hover:border-amber-300',
   },
 ] as const;
+
+/** Minimalist landing-style icon chip: white circle, hairline border, sky stroke icon. */
+function IconChip({
+  icon: Icon,
+  size = 'md',
+  className,
+}: {
+  icon: typeof Mic;
+  size?: 'sm' | 'md';
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex shrink-0 items-center justify-center rounded-full border border-line bg-surface',
+        size === 'md' ? 'h-10 w-10' : 'h-8 w-8',
+        className
+      )}
+    >
+      <Icon
+        className={size === 'md' ? 'h-[18px] w-[18px]' : 'h-3.5 w-3.5'}
+        strokeWidth={1.5}
+        style={{ color: '#0ea5e9' }}
+      />
+    </span>
+  );
+}
 
 type NotesFilter = 'all' | 'study' | 'meeting';
 
@@ -131,16 +155,24 @@ function Dashboard() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-ink-faint">{today}</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-            Welcome back, {firstName}
+          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-soft shadow-sm">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#0ea5e9' }} />
+            {today}
+          </p>
+          <h1 className="mt-3 text-[28px] font-medium leading-tight tracking-tight text-ink sm:text-[34px]">
+            Welcome back,{' '}
+            <span className="font-serif italic font-normal">{firstName}</span>
           </h1>
         </div>
-        <Link to="/new">
-          <Button color="primary">
-            <Mic className="mr-1.5 h-4 w-4" />
-            Start recording
-          </Button>
+        <Link
+          to="/new"
+          className="inline-flex items-center gap-3 self-start rounded-full bg-accent py-2.5 pl-5 pr-2 text-sm font-medium text-white transition-colors hover:bg-accent-dark sm:self-auto"
+        >
+          <Mic className="h-4 w-4" strokeWidth={1.75} />
+          Start recording
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+            <ArrowRight className="h-4 w-4" />
+          </span>
         </Link>
       </div>
 
@@ -157,28 +189,21 @@ function Dashboard() {
         {WORKSPACE_MODES.map((mode, i) => (
           <Link key={mode.key} to={mode.to} className="group block h-full">
             <Card
-              className={cn(
-                'h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
-                mode.ring
-              )}
+              className="h-full rounded-3xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md group-hover:border-sky-200"
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <CardContent className="flex h-full flex-col p-5">
                 <div className="flex items-start justify-between">
-                  <span
-                    className={cn(
-                      'inline-flex h-10 w-10 items-center justify-center rounded-lg transition-transform group-hover:scale-105',
-                      mode.chip
-                    )}
-                  >
-                    <mode.icon className="h-5 w-5" />
-                  </span>
+                  <IconChip icon={mode.icon} className="transition-transform group-hover:scale-105" />
                   <ArrowUpRight className="h-4 w-4 text-ink-faint opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
-                <h3 className="mt-4 text-sm font-semibold text-ink">{mode.title}</h3>
+                <p className="mt-4 text-xs font-medium" style={{ color: '#0ea5e9' }}>
+                  {mode.tag}
+                </p>
+                <h3 className="mt-0.5 text-[15px] font-semibold text-ink">{mode.title}</h3>
                 <p className="mt-1 text-xs leading-relaxed text-ink-soft">{mode.description}</p>
-                <span className="mt-auto pt-3 inline-flex items-center gap-1 text-xs font-medium text-ink">
-                  <Mic className="h-3 w-3" /> Start speaking
+                <span className="mt-auto pt-3 inline-flex items-center gap-1.5 text-xs font-medium text-ink">
+                  <Mic className="h-3 w-3" strokeWidth={1.75} /> Start speaking
                 </span>
               </CardContent>
             </Card>
@@ -205,7 +230,7 @@ function Dashboard() {
                   className={cn(
                     'rounded-md px-3 py-1 text-xs font-medium transition-colors',
                     filter === tab.key
-                      ? 'bg-ink text-surface shadow-sm'
+                      ? 'bg-accent text-white shadow-sm'
                       : 'text-ink-soft hover:text-ink'
                   )}
                 >
@@ -221,7 +246,7 @@ function Dashboard() {
             </Link>
           </div>
 
-          <Card>
+          <Card className="rounded-3xl overflow-hidden">
             {notesLoading ? (
               <div className="space-y-3 p-4">
                 {[0, 1, 2].map((i) => (
@@ -261,7 +286,7 @@ function Dashboard() {
               </h2>
               {openActions > 0 && <Badge color="neutral">{openActions}</Badge>}
             </div>
-            <Card>
+            <Card className="rounded-3xl overflow-hidden">
               {actionNotes.length === 0 ? (
                 <CardContent className="flex flex-col items-center gap-2 py-8 text-center">
                   <CheckCircle2 className="h-5 w-5 text-ink-faint" />
@@ -275,9 +300,7 @@ function Dashboard() {
                       to={`/notes/${note._id}`}
                       className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-paper-dim"
                     >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-700">
-                        <ListTodo className="h-3.5 w-3.5" />
-                      </span>
+                      <IconChip icon={ListTodo} size="sm" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-medium text-ink">{note.title}</p>
                         <p className="text-[11px] text-ink-faint">
@@ -312,7 +335,7 @@ function Dashboard() {
                 ))}
               </div>
             ) : recentStickies.length === 0 ? (
-              <Card>
+              <Card className="rounded-3xl overflow-hidden">
                 <CardContent className="flex flex-col items-center gap-2 py-8 text-center">
                   <StickyNote className="h-5 w-5 text-ink-faint" />
                   <p className="text-xs text-ink-soft">No lists yet.</p>
@@ -348,11 +371,9 @@ function StatCard({
   loading: boolean;
 }) {
   return (
-    <Card>
+    <Card className="rounded-3xl">
       <CardContent className="flex items-center gap-3 p-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-paper-dim text-ink">
-          <Icon className="h-4 w-4" />
-        </span>
+        <IconChip icon={Icon} />
         <div className="min-w-0">
           {loading ? (
             <div className="h-6 w-10 animate-pulse rounded bg-paper-dim" />
@@ -368,7 +389,6 @@ function StatCard({
 
 function NoteRow({ note }: { note: NoteSummary }) {
   const meta = MODE_META[note.mode as NoteMode] ?? MODE_META.brain_dump;
-  const isMeeting = note.mode === 'meeting';
   const Icon = meta.icon;
 
   return (
@@ -376,14 +396,7 @@ function NoteRow({ note }: { note: NoteSummary }) {
       to={`/notes/${note._id}`}
       className="flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-paper-dim"
     >
-      <span
-        className={cn(
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
-          isMeeting ? 'bg-sky-100 text-sky-700' : 'bg-violet-100 text-violet-700'
-        )}
-      >
-        <Icon className="h-4 w-4" />
-      </span>
+      <IconChip icon={Icon} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate text-sm font-semibold text-ink">{note.title}</h3>

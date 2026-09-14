@@ -1,31 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { ChevronDown, ChevronRight, LogIn, Menu } from 'lucide-react';
-
-function VoicenLogo() {
-  // Sky-blue voice waveform bars, no background
-  return (
-    <svg viewBox="0 0 32 32" className="w-7 h-7 sm:w-8 sm:h-8" aria-label="Voicen AI logo">
-      {[
-        { x: 5, h: 10 },
-        { x: 10.5, h: 18 },
-        { x: 16, h: 26 },
-        { x: 21.5, h: 15 },
-        { x: 27, h: 8 },
-      ].map((bar, i) => (
-        <rect
-          key={i}
-          x={bar.x - 1.6}
-          y={16 - bar.h / 2}
-          width={3.2}
-          height={bar.h}
-          rx={1.6}
-          fill="#0ea5e9"
-        />
-      ))}
-    </svg>
-  );
-}
+import VoicenLogo from '@/client/components/VoicenLogo';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#top', dot: true },
@@ -41,7 +17,7 @@ export default function Navbar() {
     <div className="flex justify-center pt-4 sm:pt-6 px-3 sm:px-4">
       <nav className="bg-white rounded-full shadow-sm border border-neutral-200 pl-2 pr-2 py-2 w-full max-w-[760px] relative flex items-center gap-4">
         <span className="shrink-0 pl-1">
-          <VoicenLogo />
+          <VoicenLogo className="w-7 h-7 sm:w-8 sm:h-8" />
         </span>
 
         {/* Desktop links */}

@@ -1,23 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import { sendResetPasswordToken } from 'modelence/client';
-import { Button } from '@/client/components/ui/Button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/client/components/ui/Card';
+import { Link } from 'react-router';
+import { ArrowRight } from 'lucide-react';
+import AuthLayout, { AuthSubmitButton, Serif } from '@/client/components/AuthLayout';
 import { Input } from '@/client/components/ui/Input';
 import { Label } from '@/client/components/ui/Label';
-import { Link } from 'react-router';
-import Page from '@/client/components/Page';
 
 export default function ForgotPasswordPage() {
-  return (
-    <Page seo={{ title: 'Reset password', noindex: true }}>
-      <div className="flex items-center justify-center min-h-full">
-        <ForgotPasswordForm />
-      </div>
-    </Page>
-  );
-}
-
-function ForgotPasswordForm() {
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
 
@@ -40,70 +29,57 @@ function ForgotPasswordForm() {
 
   if (sentTo) {
     return (
-      <Card className="w-full max-w-sm mx-auto bg-white text-gray-900">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Check your inbox</CardTitle>
-        </CardHeader>
-
-        <CardContent className="flex flex-col items-center gap-4">
-          <p className="text-center text-gray-600">
-            If an account exists for{' '}
-            <span className="font-medium text-gray-900">{sentTo}</span>, we've sent a link to
-            reset your password. The link expires in one hour.
-          </p>
-          <p className="text-center text-sm text-gray-500">
-            No email? Check your spam folder.
-          </p>
-        </CardContent>
-
-        <CardFooter className="justify-center">
-          <Link
-            to="/login"
-            className="text-sm text-gray-900 underline hover:no-underline font-medium"
-          >
+      <AuthLayout
+        seo={{ title: 'Check your inbox', noindex: true }}
+        eyebrow="Reset password"
+        title={<>Check your <Serif>inbox</Serif></>}
+        footer={
+          <Link to="/login" className="font-medium text-accent-dark hover:underline">
             Back to sign in
           </Link>
-        </CardFooter>
-      </Card>
+        }
+      >
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-center text-sm leading-relaxed text-ink-soft">
+            If an account exists for <span className="font-medium text-ink">{sentTo}</span>,
+            we've sent a link to reset your password. The link expires in one hour.
+          </p>
+          <p className="text-center text-xs text-ink-faint">No email? Check your spam folder.</p>
+        </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <Card className="w-full max-w-sm mx-auto bg-white text-gray-900">
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Reset your password</CardTitle>
-      </CardHeader>
-
-      <CardContent className="space-y-6">
-        <p className="text-sm text-gray-600">
-          Enter your email address and we'll send you a link to choose a new password.
-        </p>
-
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <Label htmlFor="email" className="block mb-2">
-              Email
-            </Label>
-            <Input type="email" name="email" id="email" required />
-          </div>
-
-          <Button className="w-full" type="submit" loading={isSending}>
-            Send reset link
-          </Button>
-        </form>
-      </CardContent>
-
-      <CardFooter className="justify-center">
-        <p className="text-center text-sm text-gray-600">
+    <AuthLayout
+      seo={{ title: 'Reset password', noindex: true }}
+      eyebrow="Forgot password"
+      title={<>Reset your <Serif>password</Serif></>}
+      subtitle="Enter your email address and we'll send you a link to choose a new password."
+      footer={
+        <p>
           Remembered it?{' '}
-          <Link
-            to="/login"
-            className="text-gray-900 underline hover:no-underline font-medium"
-          >
+          <Link to="/login" className="font-medium text-accent-dark hover:underline">
             Sign in
           </Link>
         </p>
-      </CardFooter>
-    </Card>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <div>
+          <Label htmlFor="email" className="mb-2 block">
+            Email
+          </Label>
+          <Input type="email" name="email" id="email" placeholder="you@example.com" required />
+        </div>
+
+        <div className="pt-1">
+          <AuthSubmitButton>
+            {isSending ? 'Sending…' : 'Send reset link'}
+            <ArrowRight className="h-4 w-4" />
+          </AuthSubmitButton>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

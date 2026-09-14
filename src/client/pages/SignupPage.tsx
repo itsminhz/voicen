@@ -1,40 +1,29 @@
 import React, { useCallback, useState } from 'react';
 import { signupWithPassword } from 'modelence/client';
-import { Button } from '@/client/components/ui/Button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/client/components/ui/Card';
+import { Link } from 'react-router';
+import { ChevronRight } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import AuthLayout, { AuthSubmitButton, Serif } from '@/client/components/AuthLayout';
 import { Input } from '@/client/components/ui/Input';
 import { Label } from '@/client/components/ui/Label';
-import { Link } from 'react-router';
-import Page from '@/client/components/Page';
 import VerifyEmailNotice from '@/client/components/VerifyEmailNotice';
-import { toast } from 'react-hot-toast';
 
 export default function SignupPage() {
-  return (
-    <Page seo={{ title: 'Sign up', noindex: true }}>
-      <div className="flex items-center justify-center min-h-full">
-        <SignupForm />
-      </div>
-    </Page>
-  );
-}
-
-function SignupForm() {
   const [signupEmail, setSignupEmail] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    
+
     const email = String(formData.get('email'));
     const password = String(formData.get('password'));
     const confirmPassword = String(formData.get('confirmPassword'));
-    
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    
+
     try {
       await signupWithPassword({ email, password });
       setSignupEmail(email);
@@ -45,107 +34,88 @@ function SignupForm() {
 
   if (signupEmail) {
     return (
-      <VerifyEmailNotice
-        email={signupEmail}
-        title="Check your inbox"
-        footer={
-          <p className="text-center text-sm text-ink-soft">
-            Already verified?{' '}
-            <Link
-              to="/login"
-              className="text-ink underline hover:no-underline font-medium"
-            >
-              Sign in
-            </Link>
-          </p>
-        }
-      />
+      <AuthLayout
+        seo={{ title: 'Check your inbox', noindex: true }}
+        eyebrow="Almost there"
+        title={<>Check your <Serif>inbox</Serif></>}
+      >
+        <VerifyEmailNotice
+          email={signupEmail}
+          footer={
+            <p className="text-center text-sm text-ink-soft">
+              Already verified?{' '}
+              <Link to="/login" className="font-medium text-accent-dark hover:underline">
+                Sign in
+              </Link>
+            </p>
+          }
+        />
+      </AuthLayout>
     );
   }
 
   return (
-    <Card className="w-full max-w-sm mx-auto animate-slide-up">
-      <CardHeader className="text-center">
-        <CardTitle className="font-display text-xl">
-          Create your account
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <Label htmlFor="email" className="block mb-2">
-              Email
-            </Label>
-            <Input 
-              type="email" 
-              name="email" 
-              id="email" 
-              required
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="password" className="block mb-2">
-              Password
-            </Label>
-            <Input 
-              type="password" 
-              name="password" 
-              id="password" 
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="confirm-password" className="block mb-2">
-              Confirm password
-            </Label>
-            <Input 
-              type="password" 
-              name="confirmPassword" 
-              id="confirm-password" 
-              required
-            />
-          </div>
-
-          <div className="flex items-start">
-            <div className="flex items-center h-5">
-              <input
-                id="consent-terms"
-                type="checkbox"
-                name="consent-terms"
-                className="w-4 h-4 border border-line rounded bg-surface text-accent focus:ring-2 focus:ring-accent/40"
-                required
-              />
-            </div>
-            <div className="ml-3 text-sm">
-              <Label htmlFor="consent-terms" className="text-ink-soft">
-                I accept the <a className="font-medium text-accent-dark hover:underline" href="/terms" target="_blank">Terms and Conditions</a>
-              </Label>
-            </div>
-          </div>
-
-          <Button
-            className="w-full"
-            type="submit"
-          >
-            Create account
-          </Button>
-        </form>
-      </CardContent>
-
-      <CardFooter className="justify-center">
-        <p className="text-center text-sm text-ink-soft">
+    <AuthLayout
+      seo={{ title: 'Get early access', noindex: true }}
+      eyebrow="Get early access"
+      title={<>Turn your voice into <Serif>notes</Serif></>}
+      subtitle="Create a free account — your first recording becomes organized notes in under a minute."
+      footer={
+        <p>
           Already have an account?{' '}
-          <Link
-            to="/login"
-            className="text-ink underline hover:no-underline font-medium"
-          >
-            Sign in here
+          <Link to="/login" className="font-medium text-accent-dark hover:underline">
+            Sign in
           </Link>
         </p>
-      </CardFooter>
-    </Card>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <div>
+          <Label htmlFor="email" className="mb-2 block">
+            Email
+          </Label>
+          <Input type="email" name="email" id="email" placeholder="you@example.com" required />
+        </div>
+
+        <div>
+          <Label htmlFor="password" className="mb-2 block">
+            Password
+          </Label>
+          <Input type="password" name="password" id="password" required />
+        </div>
+
+        <div>
+          <Label htmlFor="confirm-password" className="mb-2 block">
+            Confirm password
+          </Label>
+          <Input type="password" name="confirmPassword" id="confirm-password" required />
+        </div>
+
+        <div className="flex items-start gap-3">
+          <input
+            id="consent-terms"
+            type="checkbox"
+            name="consent-terms"
+            className="mt-0.5 h-4 w-4 rounded border border-line bg-surface text-accent focus:ring-2 focus:ring-accent/40"
+            required
+          />
+          <Label htmlFor="consent-terms" className="text-sm font-normal text-ink-soft">
+            I accept the{' '}
+            <a className="font-medium text-accent-dark hover:underline" href="/terms" target="_blank">
+              Terms and Conditions
+            </a>
+          </Label>
+        </div>
+
+        <div className="pt-1">
+          <AuthSubmitButton>
+            Get early access
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </AuthSubmitButton>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

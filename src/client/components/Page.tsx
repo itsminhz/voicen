@@ -5,8 +5,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { useSession } from 'modelence/client';
-import { Mic } from 'lucide-react';
 import LoadingSpinner from '@/client/components/LoadingSpinner';
+import VoicenLogo from '@/client/components/VoicenLogo';
 import { Seo, type SeoProps } from '@/client/components/Seo';
 import { Button } from '@/client/components/ui/Button';
 import UserMenu from '@/client/components/UserMenu';
@@ -25,10 +25,8 @@ function Header() {
 
   return (
     <header className="flex items-center justify-between px-4 sm:px-8 h-14 border-b border-line bg-surface/80 backdrop-blur-md sticky top-0 z-10">
-      <Link to="/" className="flex items-center gap-2.5 group">
-        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-ink text-surface shadow-sm group-hover:bg-ink/85 transition-colors">
-          <Mic className="w-4 h-4" strokeWidth={2.25} />
-        </span>
+      <Link to="/" className="flex items-center gap-2 group">
+        <VoicenLogo className="w-7 h-7 transition-transform group-hover:scale-105" />
         <span className="text-[15px] font-semibold tracking-tight text-ink">
           Voicen <span className="text-ink-faint">AI</span>
         </span>

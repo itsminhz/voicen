@@ -1,24 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { getConfig, loginWithPassword, MethodError } from 'modelence/client';
-import { Button } from '@/client/components/ui/Button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/client/components/ui/Card';
+import { Link } from 'react-router';
+import { ArrowRight } from 'lucide-react';
+import AuthLayout, { AuthSubmitButton, Serif } from '@/client/components/AuthLayout';
 import { Input } from '@/client/components/ui/Input';
 import { Label } from '@/client/components/ui/Label';
-import { Link } from 'react-router';
-import Page from '@/client/components/Page';
 import VerifyEmailNotice from '@/client/components/VerifyEmailNotice';
 
 export default function LoginPage() {
-  return (
-    <Page seo={{ title: 'Sign in', noindex: true }}>
-      <div className="flex items-center justify-center min-h-full">
-        <LoginForm />
-      </div>
-    </Page>
-  );
-}
-
-function LoginForm() {
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const isSandboxEnv = getConfig('_system.env.type') === 'sandbox';
   const defaultDemoEmail = isSandboxEnv ? getConfig('example.modelenceDemoUsername') as string | undefined : undefined;
@@ -27,10 +16,10 @@ function LoginForm() {
   const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    
+
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    
+
     try {
       await loginWithPassword({ email, password });
     } catch (error) {
@@ -45,86 +34,83 @@ function LoginForm() {
 
   if (unverifiedEmail) {
     return (
-      <VerifyEmailNotice
-        email={unverifiedEmail}
-        title="Verify your email to sign in"
-        footer={
-          <button
-            type="button"
-            onClick={() => setUnverifiedEmail(null)}
-            className="text-sm text-ink-soft underline hover:no-underline"
-          >
-            Back to sign in
-          </button>
-        }
-      />
+      <AuthLayout
+        seo={{ title: 'Verify your email', noindex: true }}
+        eyebrow="One more step"
+        title={<>Verify your <Serif>email</Serif></>}
+      >
+        <VerifyEmailNotice
+          email={unverifiedEmail}
+          footer={
+            <button
+              type="button"
+              onClick={() => setUnverifiedEmail(null)}
+              className="text-sm text-ink-soft underline hover:no-underline"
+            >
+              Back to sign in
+            </button>
+          }
+        />
+      </AuthLayout>
     );
   }
 
   return (
-    <Card className="w-full max-w-sm mx-auto animate-slide-up">
-      <CardHeader className="text-center">
-        <CardTitle className="font-display text-xl">
-          Welcome back
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <Label htmlFor="email" className="block mb-2">
-              Email
-            </Label>
-            <Input 
-              type="email" 
-              name="email" 
-              id="email"
-              defaultValue={defaultDemoEmail}
-              required
-            />
-          </div>
-          
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label htmlFor="password">
-                Password
-              </Label>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-ink-soft underline hover:no-underline"
-              >
-                Forgot your password?
-              </Link>
-            </div>
-            <Input 
-              type="password" 
-              name="password" 
-              id="password" 
-              defaultValue={defaultDemoPassword}
-              required
-            />
-          </div>
-
-          <Button
-            className="w-full"
-            type="submit"
-          >
-            Login
-          </Button>
-        </form>
-      </CardContent>
-
-      <CardFooter className="justify-center">
-        <p className="text-center text-sm text-ink-soft">
+    <AuthLayout
+      seo={{ title: 'Sign in', noindex: true }}
+      eyebrow="Welcome back"
+      title={<>Sign in to <Serif>Voicen</Serif></>}
+      subtitle="Your notes, minutes and lists are waiting."
+      footer={
+        <p>
           Don't have an account?{' '}
-          <Link
-            to="/signup"
-            className="text-ink underline hover:no-underline font-medium"
-          >
-            Sign up
+          <Link to="/signup" className="font-medium text-accent-dark hover:underline">
+            Get early access
           </Link>
         </p>
-      </CardFooter>
-    </Card>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <div>
+          <Label htmlFor="email" className="mb-2 block">
+            Email
+          </Label>
+          <Input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="you@example.com"
+            defaultValue={defaultDemoEmail}
+            required
+          />
+        </div>
+
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              to="/forgot-password"
+              className="text-xs font-medium text-ink-soft hover:text-ink hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <Input
+            type="password"
+            name="password"
+            id="password"
+            defaultValue={defaultDemoPassword}
+            required
+          />
+        </div>
+
+        <div className="pt-1">
+          <AuthSubmitButton>
+            Sign in
+            <ArrowRight className="h-4 w-4" />
+          </AuthSubmitButton>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

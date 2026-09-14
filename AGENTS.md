@@ -357,11 +357,24 @@ introducing new ones:
 
 ### 12. VOICENOTE AI — FEATURE ARCHITECTURE
 
-**UI redesign (user-requested):** Theme switched from warm notebook to clean
-shadcn-style light (white/zinc, Geist font, black primary buttons). Same token
-names in index.css (`paper`, `ink`, `accent`, `line`, ...) — only values were
-remapped, so components didn't need class changes. Recording state uses `danger`
-(red). Card = rounded-xl border-line.
+**UI theme (current, landing-matched):** App tokens in index.css were remapped
+to match the landing page: `paper` #ededed, `paper-dim` #f5f2ee, surface white,
+ink neutral-900/600/400, line #e5e5e5, **accent = sky #0ea5e9** (soft #e0f2fe,
+dark #0284c7), fonts Inter (body+display) + `--font-serif` Instrument Serif
+(use `font-serif italic` for landing-style headline accents). Radius bumped
+(xl 1rem, 2xl 1.25rem); dashboard cards use `rounded-3xl`. Same token names —
+components didn't need class changes. Recording state uses `danger` (red).
+Shared `components/VoicenLogo.tsx` (sky waveform bars SVG, `className` prop)
+used by landing Navbar, app Page header, and AuthLayout.
+`components/AuthLayout.tsx` = landing-style auth shell (#ededed bg, logo top
+bar + "Back to home" pill, white rounded-3xl card w/ eyebrow badge + serif
+title, sky pill `AuthSubmitButton`, exported `Serif` helper). Login/Signup/
+Forgot/Reset pages all use it (no Page wrapper); VerifyEmailNotice is now a
+plain block (no Card/title — AuthLayout provides heading). Dashboard restyled
+to landing look: date pill w/ sky dot, serif-italic first name, sky pill
+"Start recording" CTA w/ arrow circle, `IconChip` helper (white circle,
+hairline border, sky stroke icon @1.5) used for stats/modes/note rows/rail,
+mode tiles show sky tag lines, filter tab active = bg-accent.
 
 **Top-level workspace modes (product direction):** 3 modes —
 - Student (BUILT): 6-note-mode study flow at /new.

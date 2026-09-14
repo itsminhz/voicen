@@ -104,6 +104,10 @@ const privateRoutes: RouteObject[] = [
     Component: lazy(() => import('./pages/NewMeetingPage'))
   },
   {
+    path: '/profile',
+    Component: lazy(() => import('./pages/ProfilePage'))
+  },
+  {
     path: '/stickies',
     Component: lazy(() => import('./pages/StickyBoardPage'))
   },

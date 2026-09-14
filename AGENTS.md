@@ -411,6 +411,15 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   (upsertOne). Header shows avatar via `UserMenu.tsx` (dropdown: pick
   male/female avatar with optimistic update + logout link). Default when
   unset: male avatar.
+- Profile v2: userProfiles store extended with optional `displayName` (max 60)
+  and `bio` (max 300); `profile.update` mutation (partial $set). `/profile`
+  route → ProfilePage: identity card (big avatar, avatar picker, handle, bio),
+  Account details form (display name + bio with char counter, Save enabled
+  only when dirty), 6 MiniStat cards (total/study/meetings/stickies/open
+  actions/items checked, computed client-side from voice.getNotes +
+  voice.getStickies), recent-notes activity list, logout card. UserMenu
+  dropdown shows displayName + "View profile" link; dashboard greeting uses
+  displayName first name when set.
 
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.

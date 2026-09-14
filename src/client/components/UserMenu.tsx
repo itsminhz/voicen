@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { modelenceQuery, modelenceMutation, createQueryKey } from '@modelence/react-query';
 import { useSession } from 'modelence/client';
-import { Check, LogOut } from 'lucide-react';
+import { Check, LogOut, UserRound } from 'lucide-react';
 import avatarMale from '@/client/assets/avatar-male.png';
 import avatarFemale from '@/client/assets/avatar-female.png';
 import { cn } from '@/client/lib/utils';
@@ -22,14 +22,21 @@ export default function UserMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { data } = useQuery({
-    ...modelenceQuery<{ gender: Gender | null }>('profile.get'),
+    ...modelenceQuery<{ gender: Gender | null; displayName: string; bio: string }>('profile.get'),
     enabled: !!user,
   });
 
   const { mutate: setGender } = useMutation({
     ...modelenceMutation('profile.setGender'),
     onMutate: async ({ gender }: { gender: Gender }) => {
-      queryClient.setQueryData(createQueryKey('profile.get'), { gender });
+      queryClient.setQueryData(
+        createQueryKey('profile.get'),
+        (prev: { gender: Gender | null; displayName: string; bio: string } | undefined) => ({
+          displayName: prev?.displayName ?? '',
+          bio: prev?.bio ?? '',
+          gender,
+        })
+      );
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: createQueryKey('profile.get') });
@@ -68,8 +75,24 @@ export default function UserMenu() {
       {open && (
         <div className="absolute right-0 top-11 z-50 w-56 animate-slide-up-sm rounded-xl border border-line bg-surface p-2 shadow-lg">
           <div className="px-2.5 py-2">
-            <p className="truncate text-sm font-medium text-ink">{user.handle}</p>
+            {data?.displayName?.trim() ? (
+              <>
+                <p className="truncate text-sm font-medium text-ink">{data.displayName}</p>
+                <p className="truncate text-xs text-ink-faint">{user.handle}</p>
+              </>
+            ) : (
+              <p className="truncate text-sm font-medium text-ink">{user.handle}</p>
+            )}
           </div>
+          <div className="my-1 h-px bg-line" />
+          <Link
+            to="/profile"
+            className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-ink-soft transition-colors hover:bg-paper-dim hover:text-ink"
+            onClick={() => setOpen(false)}
+          >
+            <UserRound className="h-4 w-4" />
+            View profile
+          </Link>
           <div className="my-1 h-px bg-line" />
           <p className="px-2.5 pb-1.5 pt-1 text-[11px] font-medium uppercase tracking-wider text-ink-faint">
             Avatar

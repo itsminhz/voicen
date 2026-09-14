@@ -159,6 +159,9 @@ function Dashboard() {
   const { data: stickies, isLoading: stickiesLoading } = useQuery(
     modelenceQuery<Sticky[]>('voice.getStickies')
   );
+  const { data: profile } = useQuery(
+    modelenceQuery<{ gender: string | null; displayName: string; bio: string }>('profile.get')
+  );
   const [filter, setFilter] = useState<NotesFilter>('all');
 
   const allNotes = notes ?? [];
@@ -174,7 +177,8 @@ function Dashboard() {
   const actionNotes = allNotes.filter((n) => (n.openActionItems ?? 0) > 0).slice(0, 4);
   const recentStickies = (stickies ?? []).slice(0, 4);
 
-  const firstName = user?.handle?.split(/[@ ]/)[0] ?? 'there';
+  const firstName =
+    profile?.displayName?.trim().split(' ')[0] || user?.handle?.split(/[@ ]/)[0] || 'there';
   const today = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
     month: 'long',

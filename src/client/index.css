@@ -91,20 +91,21 @@
 }
 
 .animated-border-pill {
-  border: 1.5px solid transparent;
+  border: 2.5px solid transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
     conic-gradient(
       from var(--border-angle),
-      #0ea5e9,
-      #7dd3fc,
-      #e0f2fe,
-      #ffffff,
-      #38bdf8,
-      #0284c7,
-      #0ea5e9
+      #0284c7 0%,
+      #0ea5e9 20%,
+      #7dd3fc 35%,
+      #ffffff 50%,
+      #7dd3fc 65%,
+      #0ea5e9 80%,
+      #0284c7 100%
     ) border-box;
-  animation: border-spin 3.5s linear infinite;
+  animation: border-spin 2.5s linear infinite;
+  box-shadow: 0 0 14px rgba(14, 165, 233, 0.35);
 }
 
 /* Base UI: establish a stacking context at the root so portalled

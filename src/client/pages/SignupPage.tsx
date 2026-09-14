@@ -21,6 +21,8 @@ export default function SignupPage() {
     }
     setIsDemoLoading(true);
     try {
+      // Re-show the dashboard tour on every fresh demo login.
+      sessionStorage.removeItem('voicenTourDismissed');
       await loginWithPassword({ email, password });
     } catch (error) {
       console.error((error as Error).message);

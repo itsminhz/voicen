@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { modelenceQuery } from '@modelence/react-query';
-import { useSession } from 'modelence/client';
+import { getConfig, useSession } from 'modelence/client';
 import {
   Mic,
   GraduationCap,
@@ -25,7 +25,55 @@ import { Badge } from '@/client/components/ui/Badge';
 import { MODE_META, type NoteMode } from '@/client/features/voice/modes';
 import type { NoteSummary } from '@/client/features/voice/types';
 import { STICKY_COLOR_CLASSES, type Sticky } from '@/client/features/voice/stickyTypes';
+import DemoTour, { type TourStep } from '@/client/components/DemoTour';
 import { cn } from '@/client/lib/utils';
+
+const TOUR_DISMISSED_KEY = 'voicenTourDismissed';
+
+const TOUR_STEPS: TourStep[] = [
+  {
+    target: 'start-recording',
+    title: 'Start recording',
+    description:
+      'This is the main button — tap it, speak naturally, and Voicen turns your voice into an organized study note.',
+  },
+  {
+    target: 'modes',
+    title: 'Three workspaces',
+    description:
+      'Student makes study notes & flashcards, Meetings captures minutes with action items, and Sticky Notes turns rambling into checkable lists. Click any tile to start.',
+  },
+  {
+    target: 'stats',
+    title: 'Your numbers',
+    description:
+      'A quick count of everything you have created: total notes, study notes, meetings, and sticky lists.',
+  },
+  {
+    target: 'filters',
+    title: 'Browse your notes',
+    description:
+      'Your most recent notes live here. Use these tabs to filter by All, Study, Meetings, or Sticky lists — and "View all" opens the full list.',
+  },
+  {
+    target: 'actions',
+    title: 'Open action items',
+    description:
+      'To-dos captured from your meetings show up here so nothing slips. Click one to open the meeting note and check items off.',
+  },
+  {
+    target: 'stickies',
+    title: 'Sticky lists',
+    description:
+      'Your latest voice-made checklists. "Open board" takes you to the full sticky board where you can check items off.',
+  },
+  {
+    target: 'profile',
+    title: 'Your profile',
+    description:
+      'Click the avatar to edit your profile, switch avatars, or log out. That is it — enjoy Voicen!',
+  },
+];
 
 export default function HomePage() {
   const { user } = useSession();
@@ -128,6 +176,21 @@ function Dashboard() {
     modelenceQuery<{ gender: string | null; displayName: string; bio: string }>('profile.get')
   );
   const [filter, setFilter] = useState<NotesFilter>('all');
+  const [showTour, setShowTour] = useState(false);
+
+  const demoEmail = getConfig('example.modelenceDemoUsername') as string | undefined;
+  const isDemo = !!demoEmail && user?.handle === demoEmail;
+
+  useEffect(() => {
+    if (isDemo && sessionStorage.getItem(TOUR_DISMISSED_KEY) !== '1') {
+      setShowTour(true);
+    }
+  }, [isDemo]);
+
+  const closeTour = () => {
+    sessionStorage.setItem(TOUR_DISMISSED_KEY, '1');
+    setShowTour(false);
+  };
 
   const allNotes = notes ?? [];
   const studyCount = allNotes.filter((n) => n.mode !== 'meeting').length;
@@ -156,6 +219,7 @@ function Dashboard() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-8 py-2 animate-fade-in">
+      {showTour && <DemoTour steps={TOUR_STEPS} onClose={closeTour} />}
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -170,6 +234,7 @@ function Dashboard() {
         </div>
         <Link
           to="/new"
+          data-tour="start-recording"
           className="inline-flex items-center gap-3 self-start rounded-full bg-accent py-2.5 pl-5 pr-2 text-sm font-medium text-white transition-colors hover:bg-accent-dark sm:self-auto"
         >
           <Mic className="h-4 w-4" strokeWidth={1.75} />
@@ -181,7 +246,7 @@ function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div data-tour="stats" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard icon={FileText} label="Total notes" value={allNotes.length} loading={notesLoading} />
         <StatCard icon={GraduationCap} label="Study notes" value={studyCount} loading={notesLoading} />
         <StatCard icon={Users} label="Meetings" value={meetingCount} loading={notesLoading} />
@@ -189,7 +254,7 @@ function Dashboard() {
       </div>
 
       {/* Mode tiles */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div data-tour="modes" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {WORKSPACE_MODES.map((mode, i) => (
           <Link key={mode.key} to={mode.to} className="group block h-full">
             <Card
@@ -220,7 +285,7 @@ function Dashboard() {
         {/* Recent notes */}
         <div className="lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-1 rounded-lg border border-line bg-surface p-0.5 shadow-sm">
+            <div data-tour="filters" className="flex items-center gap-1 rounded-lg border border-line bg-surface p-0.5 shadow-sm">
               {(
                 [
                   { key: 'all', label: 'All' },
@@ -311,7 +376,7 @@ function Dashboard() {
         {/* Right rail */}
         <div className="space-y-6">
           {/* Action items */}
-          <div>
+          <div data-tour="actions">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">
                 Open action items
@@ -348,7 +413,7 @@ function Dashboard() {
           </div>
 
           {/* Sticky lists */}
-          <div>
+          <div data-tour="stickies">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-faint">
                 Sticky lists

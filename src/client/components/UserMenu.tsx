@@ -62,6 +62,7 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((v) => !v)}
+        data-tour="profile"
         className="flex items-center gap-2 rounded-full transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
         aria-label="Open user menu"
       >

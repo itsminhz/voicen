@@ -480,10 +480,21 @@ displayName to "Alex" for the demo handle (until profile sets its own name).
 - Mic errors: useVoiceRecorder detects embedded iframe (`window.self !== window.top`) and tells user to open app in its own tab; handles NotReadableError/SecurityError.
 - Server-side `console.error` logging added in assemblyai.ts and novita.ts (visible in dashboard Logs).
 
-**Favicon:** `src/client/public/favicon.svg` (Vite root is src/client so public/
-is served at /) — white rounded square + sky waveform bars matching VoicenLogo.
-Linked in `src/client/index.html` (`rel=icon` + apple-touch-icon) along with a
-static `<title>Voicen AI</title>` fallback.
+**Favicon:** `src/client/public/` (Vite root is src/client so public/ is served
+at /) contains favicon.svg (v=2), favicon.ico (16/32/48 multi-size), favicon-32.png,
+apple-touch-icon.png (180px) — white rounded square + sky waveform bars matching
+VoicenLogo. Generated from the SVG with @resvg/resvg-js + png-to-ico (installed
+ad-hoc in /tmp, not project deps). All four linked in `src/client/index.html`
+plus static `<title>Voicen AI</title>` fallback.
+
+**Demo tour:** `src/client/components/DemoTour.tsx` — lightweight spotlight tour
+(no library): dims page via box-shadow hole, sky-border spotlight, tooltip card
+with Back/Next/Skip, Esc/arrow keys. Steps target `[data-tour="..."]` attributes.
+HomePage defines TOUR_STEPS (start-recording, modes, stats, filters, actions,
+stickies, profile — profile attr is on the UserMenu avatar button). Shown to the
+demo account only (`user.handle === getConfig('example.modelenceDemoUsername')`),
+gated by sessionStorage key `voicenTourDismissed`; SignupPage's handleDemoLogin
+removes that key so every demo login re-shows the tour.
 
 **Latest UX tweaks (Sep 14):** header no longer shows the user's email next to
 the avatar (Page.tsx renders just `<UserMenu />`); SignupPage slimmed down (no

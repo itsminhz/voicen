@@ -421,6 +421,18 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   dropdown shows displayName + "View profile" link; dashboard greeting uses
   displayName first name when set.
 
+**Landing page v2 (Convix-style hero, 2026-09-14):**
+- Logged-out HomePage renders `LandingHero` (no Page wrapper, own Seo) in
+  `src/client/components/landing/`: LandingHero.tsx (full-viewport rounded
+  hero, cloudfront bg video + white/10 overlay, Inter font, badge "Voicen AI",
+  headline "Shaping *Notes* of tomorrow" w/ Instrument Serif italic, dark
+  #0b0f1a "Get Started" pill → /signup), Navbar.tsx (floating white pill,
+  orange #ef4d23 8-petal flower SVG logo, desktop links + mobile hamburger
+  dropdown, orange "Get early access" → /signup), DashboardPreview.tsx
+  (#f5f2ee tray, 3 cards: Notes gauge 92%, settings form, Voice Minutes gauge
+  68%), Gauge.tsx (40-tick 180° SVG arc). Fonts Inter + Instrument Serif
+  imported in index.css. Nav links are decorative (preventDefault).
+
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.
 - Novita kimi-k3 confirmed working BUT intermittently returns 429 `server_overload` → novita.ts retries up to 3x with backoff. kimi-k3 is a reasoning model (`reasoning_content` separate from `content`) → `max_tokens: 8000` set to avoid empty content on `finish_reason: length`.

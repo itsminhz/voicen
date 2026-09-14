@@ -10,7 +10,6 @@ import {
   StickyNote,
   ArrowRight,
   ArrowUpRight,
-  Sparkles,
   FileText,
   CheckCircle2,
   ListTodo,
@@ -18,6 +17,8 @@ import {
   Clock,
 } from 'lucide-react';
 import Page from '@/client/components/Page';
+import { Seo } from '@/client/components/Seo';
+import LandingHero from '@/client/components/landing/LandingHero';
 import { Card, CardContent } from '@/client/components/ui/Card';
 import { Button } from '@/client/components/ui/Button';
 import { Badge } from '@/client/components/ui/Badge';
@@ -29,79 +30,19 @@ import { cn } from '@/client/lib/utils';
 export default function HomePage() {
   const { user } = useSession();
 
-  return <Page seo={{}}>{user ? <Dashboard /> : <Landing />}</Page>;
-}
+  if (!user) {
+    return (
+      <>
+        <Seo />
+        <LandingHero />
+      </>
+    );
+  }
 
-/* ------------------------------- Landing ------------------------------- */
-
-function Landing() {
   return (
-    <div className="flex flex-1 items-center justify-center py-12">
-      <div className="mx-auto max-w-2xl px-4 text-center animate-fade-in">
-        <span className="mx-auto mb-8 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-soft shadow-sm">
-          <Sparkles className="h-3 w-3" />
-          AI-powered voice notes
-        </span>
-        <h1 className="text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-          Speak it. <span className="text-ink-faint">We'll write it.</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-ink-soft">
-          Voicen AI turns your voice into organized notes — study notes for students,
-          structured minutes for meetings, and clean lists for everything else.
-        </p>
-        <div className="mt-9 flex items-center justify-center gap-3">
-          <Link to="/signup">
-            <Button size="lg" color="primary">
-              Get Started
-              <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button size="lg" variant="outline">
-              Log in
-            </Button>
-          </Link>
-        </div>
-
-        <div className="mt-16 grid grid-cols-1 gap-4 text-left sm:grid-cols-3">
-          <FeatureCard
-            icon={GraduationCap}
-            title="Student"
-            description="Lectures and ideas become structured study notes, flashcards and exam prep."
-          />
-          <FeatureCard
-            icon={Users}
-            title="Meetings"
-            description="Conversations become summaries with action items and key decisions."
-          />
-          <FeatureCard
-            icon={StickyNote}
-            title="Sticky Notes"
-            description="Quick thoughts become beautiful, checkable lists — like Keep, but by voice."
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: typeof Mic;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-sm transition-shadow hover:shadow-md animate-slide-up">
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-paper-dim text-ink">
-        <Icon className="h-4.5 w-4.5" />
-      </span>
-      <h3 className="mt-3 text-sm font-semibold text-ink">{title}</h3>
-      <p className="mt-1 text-xs leading-relaxed text-ink-soft">{description}</p>
-    </div>
+    <Page seo={{}}>
+      <Dashboard />
+    </Page>
   );
 }
 

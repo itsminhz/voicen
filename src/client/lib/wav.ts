@@ -77,6 +77,62 @@ export async function blobToWav(blob: Blob): Promise<Blob> {
   }
 }
 
+/**
+ * Splits a mono 16-bit PCM WAV blob into multiple valid WAV blobs of at most
+ * `chunkSeconds` each. AssemblyAI's Dictation API caps each request at 120s of
+ * audio, so long recordings are transcribed chunk by chunk.
+ */
+export async function sliceWavBlob(wavBlob: Blob, chunkSeconds: number): Promise<Blob[]> {
+  const arrayBuffer = await wavBlob.arrayBuffer();
+  const view = new DataView(arrayBuffer);
+  const sampleRate = view.getUint32(24, true);
+  const blockAlign = view.getUint16(32, true);
+  const dataSize = view.getUint32(40, true);
+
+  const bytesPerChunk = Math.floor(chunkSeconds * sampleRate) * blockAlign;
+  if (dataSize <= bytesPerChunk) {
+    return [wavBlob];
+  }
+
+  const header = new Uint8Array(arrayBuffer.slice(0, 44));
+  const chunks: Blob[] = [];
+  for (let offset = 0; offset < dataSize; offset += bytesPerChunk) {
+    const size = Math.min(bytesPerChunk, dataSize - offset);
+    const chunkHeader = new Uint8Array(header); // copy
+    const headerView = new DataView(chunkHeader.buffer);
+    headerView.setUint32(4, 36 + size, true);
+    headerView.setUint32(40, size, true);
+    const data = arrayBuffer.slice(44 + offset, 44 + offset + size);
+    chunks.push(new Blob([chunkHeader, data], { type: 'audio/wav' }));
+  }
+  return chunks;
+}
+
+const CHUNK_SECONDS = 100; // stay safely under AssemblyAI's 120s-per-request cap
+
+/**
+ * Transcribes a WAV blob of any length by slicing it into <=100s chunks and
+ * transcribing them sequentially, joining the resulting text.
+ */
+export async function transcribeWavInChunks(
+  wavBlob: Blob,
+  transcribeChunk: (audioBase64: string) => Promise<{ transcript: string }>,
+  onProgress?: (done: number, total: number) => void
+): Promise<string> {
+  const chunks = await sliceWavBlob(wavBlob, CHUNK_SECONDS);
+  const parts: string[] = [];
+  for (let i = 0; i < chunks.length; i++) {
+    onProgress?.(i, chunks.length);
+    const audioBase64 = await blobToBase64(chunks[i]);
+    const { transcript } = await transcribeChunk(audioBase64);
+    if (transcript?.trim()) {
+      parts.push(transcript.trim());
+    }
+    onProgress?.(i + 1, chunks.length);
+  }
+  return parts.join(' ');
+}
+
 export function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

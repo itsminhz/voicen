@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { blobToWav } from '@/client/lib/wav';
 
-export const MAX_RECORDING_SECONDS = 110; // stay under AssemblyAI's 120s cap
+export const MAX_RECORDING_SECONDS = 3 * 60 * 60; // 3 hours; long audio is transcribed in chunks
 
 export type RecorderStatus = 'idle' | 'requesting' | 'recording' | 'stopped' | 'error';
 

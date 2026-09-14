@@ -12,15 +12,17 @@ import MicButton from '@/client/features/voice/MicButton';
 import Waveform from '@/client/features/voice/Waveform';
 import ProcessingStage, { type ProcessingPhase } from '@/client/features/voice/ProcessingStage';
 import MeetingNoteView from '@/client/features/voice/MeetingNoteView';
-import { useVoiceRecorder, MAX_RECORDING_SECONDS } from '@/client/features/voice/useVoiceRecorder';
-import { blobToBase64 } from '@/client/lib/wav';
+import { useVoiceRecorder } from '@/client/features/voice/useVoiceRecorder';
+import { transcribeWavInChunks } from '@/client/lib/wav';
 import type { GeneratedMeetingNote } from '@/client/features/voice/types';
 
 type Step = 'record' | 'transcript' | 'processing' | 'preview';
 
 function formatTime(seconds: number) {
-  const m = Math.floor(seconds / 60);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
+  if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
@@ -53,9 +55,10 @@ export default function NewMeetingPage() {
     setStep('processing');
     setPhase('transcribing');
     try {
-      const audioBase64 = await blobToBase64(blob);
-      const result = await transcribeMutation.mutateAsync({ audioBase64 });
-      setTranscript(result.transcript);
+      const fullTranscript = await transcribeWavInChunks(blob, (audioBase64) =>
+        transcribeMutation.mutateAsync({ audioBase64 })
+      );
+      setTranscript(fullTranscript);
       setStep('transcript');
       setTranscribeError(null);
     } catch (err: any) {
@@ -171,10 +174,7 @@ export default function NewMeetingPage() {
                   <div className="text-center">
                     {recorder.status === 'recording' ? (
                       <>
-                        <p className="font-mono text-lg text-ink">
-                          {formatTime(recorder.seconds)}{' '}
-                          <span className="text-ink-faint">/ {formatTime(MAX_RECORDING_SECONDS)}</span>
-                        </p>
+                        <p className="font-mono text-lg text-ink">{formatTime(recorder.seconds)}</p>
                         <p className="mt-1 text-sm text-ink-soft">Recording the conversation... tap to stop</p>
                       </>
                     ) : recorder.status === 'requesting' ? (

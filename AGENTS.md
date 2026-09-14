@@ -476,9 +476,16 @@ displayName to "Alex" for the demo handle (until profile sets its own name).
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.
 - Novita kimi-k3 confirmed working BUT intermittently returns 429 `server_overload` → novita.ts retries up to 3x with backoff. kimi-k3 is a reasoning model (`reasoning_content` separate from `content`) → `max_tokens: 8000` set to avoid empty content on `finish_reason: length`.
-- Modelence JSON body limit is 16MB → client resamples audio to mono 16kHz (OfflineAudioContext in `src/client/lib/wav.ts`) before WAV encoding; 110s recording ≈ 4.7MB base64.
+- Modelence JSON body limit is 16MB → client resamples audio to mono 16kHz (OfflineAudioContext in `src/client/lib/wav.ts`) before WAV encoding. Long recordings (up to 3h) are split client-side into ≤100s WAV chunks (`sliceWavBlob` patches header sizes at bytes 4/40) and transcribed sequentially via `transcribeWavInChunks`, joining transcript text — keeps each request under AssemblyAI's 120s cap and the body limit.
 - Mic errors: useVoiceRecorder detects embedded iframe (`window.self !== window.top`) and tells user to open app in its own tab; handles NotReadableError/SecurityError.
 - Server-side `console.error` logging added in assemblyai.ts and novita.ts (visible in dashboard Logs).
+
+**Latest UX tweaks (Sep 14):** header no longer shows the user's email next to
+the avatar (Page.tsx renders just `<UserMenu />`); SignupPage slimmed down (no
+confirm-password field, no terms checkbox — replaced by a one-line "By signing
+up you agree to the Terms." caption, no subtitle, no demo caption line). Demo
+login only ever calls `loginWithPassword` with the fixed demo@modelence.dev
+credentials — it is one shared persistent account, never creates a new one.
 
 This app ("VoiceNote AI") is an AI voice note / study assistant. Design identity
 is established (see `DESIGN.md`): warm "calm notebook" palette (cream/ink/amber),
@@ -516,7 +523,10 @@ route) → server decodes base64 → Buffer → AssemblyAI.
 
 **Client feature folder (`src/client/features/voice/`)**
 - `useVoiceRecorder.ts` — recording hook (status/seconds/levels/error, start/stop/
-  reset). `MAX_RECORDING_SECONDS = 110` (under AssemblyAI's 120s cap).
+  reset). `MAX_RECORDING_SECONDS = 10800` (3h); chunked transcription in
+  `wav.ts` (`transcribeWavInChunks`) handles AssemblyAI's 120s-per-request cap.
+  All 3 recording pages use it in handleStop; timer UI shows elapsed only
+  (hours-capable formatTime, no "/ max" suffix).
 - `modes.ts` — `NOTE_MODES` + `MODE_META` (label/description/icon per mode).
 - `types.ts` — `GeneratedNote`, `NoteSummary`, `FullNote` client-side types.
 - `MicButton.tsx`, `Waveform.tsx` — recording UI (pulse/ring animations, live

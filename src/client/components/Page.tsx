@@ -34,9 +34,6 @@ function Header() {
 
       {user ? (
         <div className="flex items-center gap-3">
-          <span className="text-sm text-ink-soft hidden sm:inline">
-            {user.handle}
-          </span>
           <UserMenu />
         </div>
       ) : (

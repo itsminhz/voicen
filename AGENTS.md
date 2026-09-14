@@ -439,6 +439,11 @@ remapped, so components didn't need class changes. Recording state uses `danger`
   Navbar links now real anchors (#top/#features/#about); html has
   scroll-behavior smooth. LogoutPage now redirects to '/' (was /login) so
   logged-out users land on the landing page.
+- Landing accent recolored from orange #ef4d23 to sky #0ea5e9 (tint #e0f2fe,
+  gradient #38bdf8→#0284c7 = SKY_GRADIENT const). Icons enhanced: navbar logo
+  is now a sky-gradient rounded tile with white waveform bars (VoicenLogo SVG);
+  cart icon replaced with LogIn icon → /login; feature/step icon chips are
+  gradient tiles with white icons (ring-4 ring-sky-100 on features).
 
 **Reliability hardening (verified with live API tests using real keys):**
 - AssemblyAI Dictation API confirmed working (200) with exact server FormData pattern; raw `Authorization` header (no Bearer); invalid key → 404.

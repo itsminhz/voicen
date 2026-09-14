@@ -41,7 +41,7 @@ export default function LandingHero() {
               className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 shadow-sm"
               style={{ fontSize: 13 }}
             >
-              <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: '#ef4d23' }} />
+              <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: '#0ea5e9' }} />
               Voicen AI
             </span>
 

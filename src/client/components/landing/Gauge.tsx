@@ -8,7 +8,7 @@ interface GaugeProps {
 
 const TICKS = 40;
 
-export default function Gauge({ value, color = '#ef4d23', showLabels, min, max }: GaugeProps) {
+export default function Gauge({ value, color = '#0ea5e9', showLabels, min, max }: GaugeProps) {
   const active = Math.round((value / 100) * TICKS);
   const cx = 100;
   const cy = 100;

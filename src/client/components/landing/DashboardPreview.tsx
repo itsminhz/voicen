@@ -1,7 +1,7 @@
 import { ChevronDown, TrendingDown, TrendingUp, X } from 'lucide-react';
 import Gauge from './Gauge';
 
-const ORANGE = '#ef4d23';
+const SKY = '#0ea5e9';
 
 function TogglePill({ active, inactive }: { active: string; inactive: string }) {
   return (
@@ -50,7 +50,7 @@ export default function DashboardPreview() {
           {/* Card 1 — Notes */}
           <div className="bg-white rounded-2xl p-5 text-left">
             <div className="flex items-center justify-between" style={{ fontSize: 13 }}>
-              <span className="font-medium" style={{ color: ORANGE }}>
+              <span className="font-medium" style={{ color: SKY }}>
                 Notes
               </span>
               <span className="text-neutral-500">This Month</span>
@@ -68,7 +68,7 @@ export default function DashboardPreview() {
             <p className="mt-3 text-center text-neutral-700" style={{ fontSize: 12 }}>
               Month Target achieved
             </p>
-            <Gauge value={92} color={ORANGE} showLabels min="389K" max="425K" />
+            <Gauge value={92} color={SKY} showLabels min="389K" max="425K" />
             <div className="mt-3">
               <TogglePill active="Transcripts" inactive="Notes" />
             </div>
@@ -83,7 +83,7 @@ export default function DashboardPreview() {
             <div className="mt-auto flex items-center gap-4 pt-1">
               <button
                 className="text-white rounded-lg px-5 py-2 font-medium"
-                style={{ backgroundColor: ORANGE, fontSize: 13 }}
+                style={{ backgroundColor: SKY, fontSize: 13 }}
               >
                 Save
               </button>
@@ -97,7 +97,7 @@ export default function DashboardPreview() {
           {/* Card 3 — Voice Minutes */}
           <div className="bg-white rounded-2xl p-5 text-left">
             <div className="flex items-center justify-between" style={{ fontSize: 13 }}>
-              <span className="font-medium" style={{ color: ORANGE }}>
+              <span className="font-medium" style={{ color: SKY }}>
                 Voice Minutes
               </span>
               <span className="text-neutral-500">today</span>

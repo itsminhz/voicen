@@ -1,23 +1,36 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { ChevronDown, ChevronRight, ShoppingCart, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, LogIn, Menu } from 'lucide-react';
 
-function FlowerLogo() {
-  // Orange 8-petal flower: 8 circles at radius 10 around center (16,16) + center circle
-  const petals = Array.from({ length: 8 }, (_, i) => {
-    const angle = (i / 8) * Math.PI * 2;
-    return {
-      cx: 16 + 10 * Math.cos(angle),
-      cy: 16 + 10 * Math.sin(angle),
-    };
-  });
-
+function VoicenLogo() {
+  // Sky gradient rounded tile with white voice waveform bars
   return (
     <svg viewBox="0 0 32 32" className="w-7 h-7 sm:w-8 sm:h-8" aria-label="Voicen AI logo">
-      {petals.map((p, i) => (
-        <circle key={i} cx={p.cx} cy={p.cy} r={3.5} fill="#ef4d23" />
+      <defs>
+        <linearGradient id="voicen-logo-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="100%" stopColor="#0284c7" />
+        </linearGradient>
+      </defs>
+      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#voicen-logo-grad)" />
+      {/* waveform bars */}
+      {[
+        { x: 7.5, h: 8 },
+        { x: 12, h: 14 },
+        { x: 16.5, h: 20 },
+        { x: 21, h: 12 },
+        { x: 25.5, h: 6 },
+      ].map((bar, i) => (
+        <rect
+          key={i}
+          x={bar.x - 1.25}
+          y={16 - bar.h / 2}
+          width={2.5}
+          height={bar.h}
+          rx={1.25}
+          fill="white"
+        />
       ))}
-      <circle cx={16} cy={16} r={3.5} fill="#ef4d23" />
     </svg>
   );
 }
@@ -36,7 +49,7 @@ export default function Navbar() {
     <div className="flex justify-center pt-4 sm:pt-6 px-3 sm:px-4">
       <nav className="bg-white rounded-full shadow-sm border border-neutral-200 pl-2 pr-2 py-2 w-full max-w-[760px] relative flex items-center gap-4">
         <span className="shrink-0 pl-1">
-          <FlowerLogo />
+          <VoicenLogo />
         </span>
 
         {/* Desktop links */}
@@ -50,7 +63,7 @@ export default function Navbar() {
                   ? 'inline-flex items-center gap-0.5 font-medium'
                   : 'inline-flex items-center gap-1.5 text-neutral-800 font-medium'
               }
-              style={item.accent ? { color: '#ef4d23' } : undefined}
+              style={item.accent ? { color: '#0ea5e9' } : undefined}
             >
               {item.dot && <span className="w-[6px] h-[6px] rounded-full bg-black" style={{ width: 6, height: 6 }} />}
               {item.label}
@@ -61,16 +74,17 @@ export default function Navbar() {
 
         {/* Right cluster */}
         <div className="ml-auto flex items-center gap-2">
-          <button
+          <Link
+            to="/login"
             className="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-neutral-100 transition-colors"
-            aria-label="Cart"
+            aria-label="Log in"
           >
-            <ShoppingCart className="w-4.5 h-4.5 text-neutral-800" />
-          </button>
+            <LogIn className="w-4.5 h-4.5 text-neutral-800" />
+          </Link>
           <Link
             to="/signup"
             className="inline-flex items-center gap-2 rounded-full text-white font-medium pl-4 sm:pl-5 pr-1.5 py-1.5"
-            style={{ backgroundColor: '#ef4d23', fontSize: 13 }}
+            style={{ backgroundColor: '#0ea5e9', fontSize: 13 }}
           >
             <span className="hidden sm:inline">Get early access</span>
             <span className="sm:hidden">Early access</span>
@@ -96,7 +110,7 @@ export default function Navbar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 rounded-xl px-3 py-2.5 font-medium hover:bg-neutral-50"
-                style={{ fontSize: 14, color: item.accent ? '#ef4d23' : '#262626' }}
+                style={{ fontSize: 14, color: item.accent ? '#0ea5e9' : '#262626' }}
               >
                 {item.dot && <span className="rounded-full bg-black" style={{ width: 6, height: 6 }} />}
                 {item.label}

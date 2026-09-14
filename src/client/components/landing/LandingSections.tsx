@@ -10,7 +10,8 @@ import {
   ListChecks,
 } from 'lucide-react';
 
-const ORANGE = '#ef4d23';
+const SKY = '#0ea5e9';
+const SKY_GRADIENT = 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)';
 
 function Serif({ children }: { children: React.ReactNode }) {
   return (
@@ -85,7 +86,7 @@ export default function LandingSections() {
               className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 shadow-sm border border-neutral-200"
               style={{ fontSize: 13 }}
             >
-              <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: ORANGE }} />
+              <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: SKY }} />
               Three modes
             </span>
             <h2
@@ -108,12 +109,12 @@ export default function LandingSections() {
             {FEATURES.map((f) => (
               <div key={f.title} className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm">
                 <span
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-2xl"
-                  style={{ backgroundColor: '#fef1ec', color: ORANGE }}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md ring-4 ring-sky-100"
+                  style={{ background: SKY_GRADIENT }}
                 >
-                  <f.icon className="h-5 w-5" />
+                  <f.icon className="h-5.5 w-5.5" strokeWidth={1.75} />
                 </span>
-                <p className="mt-4 font-medium" style={{ fontSize: 12, color: ORANGE }}>
+                <p className="mt-4 font-medium" style={{ fontSize: 12, color: SKY }}>
                   {f.tag}
                 </p>
                 <h3 className="mt-1 text-neutral-900" style={{ fontSize: 20, fontWeight: 600 }}>
@@ -125,7 +126,7 @@ export default function LandingSections() {
                 <ul className="mt-4 space-y-2">
                   {f.points.map((p) => (
                     <li key={p} className="flex items-center gap-2 text-neutral-700" style={{ fontSize: 13 }}>
-                      <span className="rounded-full shrink-0" style={{ width: 6, height: 6, backgroundColor: ORANGE }} />
+                      <span className="rounded-full shrink-0" style={{ width: 6, height: 6, backgroundColor: SKY }} />
                       {p}
                     </li>
                   ))}
@@ -162,10 +163,10 @@ export default function LandingSections() {
               <div key={s.step} className="rounded-2xl bg-[#f5f2ee] p-5">
                 <div className="flex items-center justify-between">
                   <span
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm"
-                    style={{ color: ORANGE }}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md"
+                    style={{ background: SKY_GRADIENT }}
                   >
-                    <s.icon className="h-4 w-4" />
+                    <s.icon className="h-4.5 w-4.5" strokeWidth={1.75} />
                   </span>
                   <span className="text-neutral-400 font-medium" style={{ fontSize: 12 }}>
                     {s.step}
@@ -207,7 +208,7 @@ export default function LandingSections() {
             <Link
               to="/signup"
               className="inline-flex items-center gap-3 text-white rounded-full pl-6 pr-2 py-2.5"
-              style={{ backgroundColor: ORANGE, fontSize: 14 }}
+              style={{ backgroundColor: SKY, fontSize: 14 }}
             >
               Get early access
               <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/20">
@@ -229,7 +230,7 @@ export default function LandingSections() {
       <footer className="px-3 sm:px-4 py-8">
         <div className="mx-auto max-w-[1080px] flex flex-col sm:flex-row items-center justify-between gap-3 text-neutral-500" style={{ fontSize: 13 }}>
           <span className="inline-flex items-center gap-2">
-            <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: ORANGE }} />
+            <span className="rounded-full" style={{ width: 8, height: 8, backgroundColor: SKY }} />
             <span className="font-medium text-neutral-800">Voicen AI</span> — voicen.xyz
           </span>
           <div className="flex items-center gap-5">

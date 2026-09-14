@@ -58,6 +58,14 @@ const publicRoutes: RouteObject[] = [
     Component: lazy(() => import('./pages/TermsPage'))
   },
   {
+    // External redirect to the demo video
+    path: '/demo',
+    Component: function DemoRedirect() {
+      window.location.replace('https://www.youtube.com/watch?v=0tM-TfsSK8g');
+      return null;
+    }
+  },
+  {
     path: '/logout',
     Component: lazy(() => import('./pages/LogoutPage'))
   },

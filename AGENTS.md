@@ -515,6 +515,10 @@ Reuse panel (ModeSelector → `voice.reuseRecording` → navigate to new note).
 Header (Page.tsx) now shows "Voices" and "Notes" nav pills for logged-in users
 (icons only on mobile; active state via pathname).
 
+**/demo redirect (Sep 14):** server route in voiceModule (`routes: [{ path: '/demo', ... }]`)
+returns a 302 to the YouTube demo video (https://www.youtube.com/watch?v=0tM-TfsSK8g);
+client router also has a `/demo` fallback that does `window.location.replace`.
+
 **Mode differentiation fix (Sep 14):** MODE_INSTRUCTIONS in novita.ts now use
 explicit FILL / LEAVE EMPTY field lists per mode so flashcards/exam/summary etc.
 produce visibly different notes. NoteView no longer renders empty sections in

@@ -53,6 +53,19 @@ const voiceModule = new Module('voice', {
 
   stores: [dbNotes, dbStickies],
 
+  routes: [
+    {
+      // Server-side redirect: /demo → demo video (works before the SPA loads)
+      path: '/demo',
+      handlers: {
+        get: async () => ({
+          status: 302,
+          redirect: 'https://www.youtube.com/watch?v=0tM-TfsSK8g',
+        }),
+      },
+    },
+  ],
+
   queries: {
     getNotes: async (_args: unknown, { user }: { user: UserInfo | null }) => {
       requireUser(user);
